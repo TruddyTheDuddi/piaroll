@@ -1,0 +1,99 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('../font/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('../font/Poppins-Bold.ttf');
+    font-weight: bold;
+}
+
+body{
+    font-family: 'Poppins';
+    display: grid;
+    gap: 2em;
+    margin: 2em;
+}
+
+h1,h2,h3,p{
+    margin: 0;
+}
+
+.info{
+    display: grid;
+    max-width: 600px;
+    gap: 1em;
+}
+
+/* Editor */
+.editor{
+    display: grid;
+    gap: 1em;
+}
+
+.selector-holder{
+    display: flex;
+    gap: 2em;
+    flex-wrap: wrap;
+}
+
+.selector{
+    display: flex;
+    gap: 0.5em;
+}
+
+.selector .select-box{
+    display: grid;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    /* background-color: rgba(0,0,0,0.05); */
+    cursor: pointer;
+}
+.selector .select-box img{
+    width: 3em;
+    height: 3em;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+}
+
+.selector .select-box.rest img{
+    transform: scale(0.7); /* Rests should look smaller for design puproses */
+}
+
+.selector .select-box input{
+    display: none;
+    visibility: hidden;
+}
+
+.selector .select-box:hover{
+    background-color: rgba(0,0,0,0.2);
+}
+
+.selector .select-box.selected{
+    background-color: rgb(35, 114, 250);
+    transition: 0.1s;
+}
+
+.selector .select-box.selected img{
+    filter: invert(1);
+}
+
+.timeline{
+    background-color: rgb(245,245,245);
+    height: 10em;
+    display: flex;
+    position: relative;
+    border-radius: 1em;
+}
+
+.timeline::before{
+    content: '';
+    position: absolute;
+    height: 1.7px;
+    background-color: black;
+    width: 100%;
+    bottom: 50%;
+    transform: translateY(-50%);
+}

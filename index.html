@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/data.js" defer></script>
+    <link rel="stylesheet" href="css/style.css">
+    <title>Piaroll</title>
+</head>
+<body>
+    <div class="info">
+        <h1>Rhythm editor</h1>
+        <p>Click to select symbols, then click on the timeline to add them. Click on a symbol in the timeline to remove it.</p>
+        <p>When you are done, you can click <b>render</b> to show what the transcribed standard notation would look like. You can also <b>play</b> your rhythmic pattern to hear if it matches the song.</p>
+    </div>
+
+    <div class="editor">
+        <div class="selector-holder">
+            <div>
+                <h3>Notes</h3>
+                <div id="notes" class="selector"></div>
+            </div>
+            <div>
+                <h3>Rests</h3>
+                <div id="rests" class="selector"></div>
+            </div>
+        </div>
+
+        <h3>Timeline</h3>
+        <div class="timeline"></div>
+    </div>
+
+    <div>
+        <h3>Random notes for later to discuss</h3>
+        <div>
+            <ul>
+                <li>
+                    Add BPM meter at the beginning of timeline
+                </li>
+                <li>
+                    BPM changes according to the selected song automatically
+                </li>
+                <li>
+                    Perhaps just 1 tab visible (notes and rests are in different tabs), you can switch between them
+                </li>
+                <li>
+                    Use a checkbox design to set dotted vs non-dotted notes, to keep it simple to understand
+                </li>
+                <li>
+                    What if rhythm plays on hover on the note? With respect to the BPM
+                </li>
+                <li>
+                    Note names on hover like popup tooltips?
+                </li>
+                <li>
+                    On play, the played note is highlighted on the timeline
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>
