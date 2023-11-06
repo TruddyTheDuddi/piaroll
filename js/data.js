@@ -24,16 +24,13 @@ function lengthPlus(len1, len2) {
     let [num1, den1] = len1;
     let [num2, den2] = len2;
 
-    while (den1 < den2) {
-        num1 *= 2;
-        den1 *= 2;
-    }
+    num1 *= den2 / den1;
 
     return normalizeLength([num1 + num2, den1]);
 }
 
 function lengthMinus(len1, [num2, den2]) {
-    return lengthPlus(len1, [-num2, den2])
+    return lengthPlus(len1, [-num2, den2]);
 }
 
 /** splits the length if it appears at a zero-based position in a
@@ -63,6 +60,8 @@ function lengthAlign(length, pos, total, base = null) {
         let num = 2;
         while (num <= remaining[0]) num *= 2;
         num /= 2;
+        // -- or const num = Math.pow(2, Math.floor(Math.log2(remaining[0])));
+
         const [newNum, newDet] = normalizeLength([num, remaining[1]]);
         let newNoteLen = LENGTHS_BY_DEN[newDet];
 
@@ -76,13 +75,13 @@ function lengthAlign(length, pos, total, base = null) {
         }
 
         // return (and recurse)
-        const newLength = lengthMinus(length, newNoteLen.length)
+        const newLength = lengthMinus(length, newNoteLen.length);
         if (newLength[0] > 0) {
             // we didn't fit the entire length -> recurse
-            const newPos = lengthPlus(pos, newNoteLen.length)
-            return [newNoteLen, ...lengthAlign(newLength, newPos, total)]
+            const newPos = lengthPlus(pos, newNoteLen.length);
+            return [newNoteLen, ...lengthAlign(newLength, newPos, total)];
         } else {
-            return [newNoteLen]
+            return [newNoteLen];
         }
     } else {
         // bar full, start new one
@@ -105,10 +104,10 @@ function noteLength(len) {
          */
         align: function(pos, total) {
             // TODO reorder subnotes to align nicely
-            return lengthAlign(this.length, pos, total, this)
+            return lengthAlign(this.length, pos, total, this);
         },
         ...len,
-    }
+    };
 }
 
 // Used in the VexFlow notation
