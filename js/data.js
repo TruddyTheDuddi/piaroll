@@ -176,7 +176,7 @@ function createNoteSelector(){
 }
 
 
-// Keeping track of the notes added. For now I'm just passing the element but should be properly updated with
+// Timeline object contains the operations on the timeline and keeps track of the notes added
 let timeline = {
     el: document.getElementById("timeline"),
 
@@ -250,7 +250,7 @@ function registerTimelineNote(pos = null){
 
     /**
      * Creates the note for the timeline with all the necessary methods
-     * @param {Object} noteData The note data (the length and if it's dotted, maybe change in future?)
+     * @param {Object} noteData As MUSIC_NOTES and boolean if it's dotted
      */
     function createTimelineNote(noteData){
         console.log('creating note');
@@ -282,7 +282,7 @@ function registerTimelineNote(pos = null){
         insertActionArea.addEventListener("mouseout", () => {
             note.classList.remove("between");
         });
-        
+
 
         return {
             noteEl: note,                    // Node element
