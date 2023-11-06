@@ -26,7 +26,7 @@ function lengthPlus(len1, len2) {
 
     num1 *= den2 / den1;
 
-    return normalizeLength([num1 + num2, den1]);
+    return normalizeLength([num1 + num2, den2]);
 }
 
 function lengthMinus(len1, [num2, den2]) {
@@ -108,6 +108,25 @@ function noteLength(len) {
         },
         ...len,
     };
+}
+
+function fit_notes(notes, bar_pos, bar_len) {
+    let out = [];
+    for (const note of notes) {
+        const lens = note.length.align(bar_pos, bar_len);
+        for (const len of lens) {
+            out.push(len != null
+                ? { length: len, source: note }
+                : null);
+        }
+
+        bar_pos = lengthPlus(bar_pos, note.length.length);
+        bar_pos[0] = bar_pos[0] % bar_pos[1];
+        if (bar_pos[0] == 0) {
+            out.push(null);
+        }
+    }
+    return out;
 }
 
 // Used in the VexFlow notation
