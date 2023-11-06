@@ -188,10 +188,10 @@ let timeline = {
         if(pos == null){
             this.editor.push(note);
             // Add to the DOM, last -1 because of the adder element
-            let timeline = document.getElementById("timeline");
-            timeline.insertBefore(note.noteEl, editor);
+            this.el.insertBefore(note.noteEl, symbolAdder);
         } else {
             this.editor.splice(pos, 0, note);
+            this.el.insertBefore(note.noteEl, this.el.children[pos]);
         }
     },
 
@@ -203,6 +203,12 @@ let timeline = {
         }
     },
 
+    // Clear the timeline (doesn't work because it will also remove editor element, fix later)
+    clearAll: function(){
+        this.editor = [];
+        this.el.innerHTML = "";
+    },
+
     // Keep track of the current symbole (note/rest) that was selected
     currentNote: {
         note: MUSIC_NOTES.quarter,
@@ -212,8 +218,8 @@ let timeline = {
 
 
 // You're able to add notes by clicking on the timeline's adder element
-const editor = document.getElementById("itemAdder");
-editor.addEventListener("click", () => {
+const symbolAdder = document.getElementById("symbolAdder");
+symbolAdder.addEventListener("click", () => {
     registerTimelineNote();
 });
 
@@ -232,6 +238,11 @@ function registerTimelineNote(pos = null){
     noteRaw.deleteTrigger.addEventListener("click", () => {
         timeline.remove(newNote);
         newNote.noteEl.remove();
+    });
+
+    // Inserting the note inbwetween two notes
+    noteRaw.insertTrigger.addEventListener("click", () => {
+        registerTimelineNote(timeline.editor.indexOf(newNote));
     });
 
     // Add the note to the timeline
