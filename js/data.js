@@ -129,6 +129,25 @@ function fit_notes(notes, bar_pos, bar_len) {
     return out;
 }
 
+function draw_bars(elements) {
+    return elements.map((element) => {
+        if (element == null) {
+            return "|";
+        } else {
+            // TODO ligature for same source
+            const [num, den] = element.length.length;
+            return "G" + num + "/" + den;
+        }
+    }).join("");
+}
+
+function render() {
+    // TODO try to split groups of notes
+    const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
+    const noteString = draw_bars(notes);
+    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:C\nM:C\n" + noteString);
+}
+
 const LENGTHS = {
     whole: noteLength({
         name: "1",
