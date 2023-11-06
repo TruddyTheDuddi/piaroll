@@ -108,7 +108,7 @@ h1,h2,h3,p{
     position: relative;
 }
 
-.timeline .item-box:hover{
+.timeline .item-box.between{
     border-left: 3px solid rgb(35, 114, 250);
 }
 
@@ -122,9 +122,7 @@ h1,h2,h3,p{
 
 .timeline .item-box .insert-action{
     position: absolute;
-    background-color: rgba(0,0,0,0.3);
     border-radius: 0.25em;
-    cursor: pointer;
     width: 100%;
     height: 100%;
     transform: translateX(-50%);
@@ -135,8 +133,14 @@ h1,h2,h3,p{
     height: 4em;
     min-width: 2.5em;
     filter: drop-shadow(2px 0px 0px rgb(245,245,245)) drop-shadow(-2px 0px 0px rgb(245,245,245));
-    cursor: not-allowed;
+    cursor: pointer;
     z-index: 1;
+    transition: opacity 0.15s;
+}
+
+.timeline .item-box .item:hover{
+    opacity: 0.5;
+    transition: opacity 0s;
 }
 
 .timeline .item-adder{
@@ -148,10 +152,10 @@ h1,h2,h3,p{
     min-width: 6em;
     border-left: 3px solid transparent;
     margin: 1em;
-    transition: 0.15s border-color-left;
+    transition: 0.15s border-left;
 }
 
 .timeline .item-adder:hover{
     border-left-color: rgb(35, 114, 250);
-    transition: 0s border-color-left;
+    transition: 0s border-left;
 }

@@ -275,6 +275,15 @@ function registerTimelineNote(pos = null){
         note.appendChild(insertActionArea);
         note.appendChild(imgNote);
 
+        // Styling, when the cursor is over the insert action area but not over the note, change the cursor
+        insertActionArea.addEventListener("mouseover", () => {
+            note.classList.add("between");
+        });
+        insertActionArea.addEventListener("mouseout", () => {
+            note.classList.remove("between");
+        });
+        
+
         return {
             noteEl: note,                    // Node element
             insertTrigger: insertActionArea, // Clicking on this area should insert a note
