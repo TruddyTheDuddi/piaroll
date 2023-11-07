@@ -114,9 +114,14 @@ function fit_notes(notes, bar_pos, bar_len) {
     let out = [];
     for (const note of notes) {
         const lens = note.length.align(bar_pos, bar_len);
-        for (const len of lens) {
+        for (let index = 0 ; index < lens.length ; index++) {
+            const len = lens[index]
             out.push(len != null
-                ? { length: len, source: note }
+                ? {
+                    length: len,
+                    source: note,
+                    hasNext: index < lens.length - 1,
+                }
                 : null);
         }
 
@@ -136,11 +141,20 @@ function draw_bars(elements) {
         if (element == null) {
             return "|";
         } else {
-            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z"
+            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
             const [num, den] = element.length.length;
-            const prefix = currentSource === element.source ? "-" : ""
+
+            let prefix = "";
+            let appendix = "";
+            if (element.hasNext) {
+                if (currentSource !== element.source) {
+                    prefix = "(";
+                }
+            } else if (currentSource === element.source) {
+                appendix = ")";
+            }
             currentSource = element.source;
-            return prefix + note + num + "/" + den;
+            return prefix + note + num + "/" + den + appendix;
         }
     }).join("");
 }
