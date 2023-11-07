@@ -107,6 +107,12 @@ let rests = [
 // Create the note selector
 createNoteSelector();
 
+// Dotted symbol (WIP, add updating to designs)
+const dotter = document.getElementById("dotter"); //checkbox
+dotter.addEventListener("click", () => {
+    timeline.currentNote.dotted = dotter.checked;
+});
+
 /**
  * Creates the note selector by adding the notes and rests
  * elements to it.
@@ -150,6 +156,11 @@ function createNoteSelector(){
             box.classList.add("selected");
             prevNote = box;
         });
+
+        // Set the seleted note in timeline
+        radio.addEventListener("click", function(){
+            timeline.currentNote.note = note;
+        });
         
         // By default select the quarter
         if(note.name == "quarter"){
@@ -161,5 +172,126 @@ function createNoteSelector(){
         box.classList.add("select-box");
         box.classList.add(note.type);
         return box;
+    }
+}
+
+
+// Timeline object contains the operations on the timeline and keeps track of the notes added
+let timeline = {
+    el: document.getElementById("timeline"),
+
+    // Keep track of the notes added to the timeline
+    editor: [],
+
+    // Add a note to the timeline at a specific position
+    insert: function(note, pos = null){
+        if(pos == null){
+            this.editor.push(note);
+            // Add to the DOM, last -1 because of the adder element
+            this.el.insertBefore(note.noteEl, symbolAdder);
+        } else {
+            this.editor.splice(pos, 0, note);
+            this.el.insertBefore(note.noteEl, this.el.children[pos]);
+        }
+    },
+
+    // Remove a note from the timeline
+    remove: function(note){
+        let index = this.editor.indexOf(note);
+        if(index > -1){
+            this.editor.splice(index, 1);
+        }
+    },
+
+    // Clear the timeline (doesn't work because it will also remove editor element, fix later)
+    clearAll: function(){
+        this.editor = [];
+        this.el.innerHTML = "";
+    },
+
+    // Keep track of the current symbole (note/rest) that was selected
+    currentNote: {
+        note: MUSIC_NOTES.quarter,
+        dotted: false,
+    }
+};
+
+
+// You're able to add notes by clicking on the timeline's adder element
+const symbolAdder = document.getElementById("symbolAdder");
+symbolAdder.addEventListener("click", () => {
+    registerTimelineNote();
+});
+
+function registerTimelineNote(pos = null){
+    // Create the note graphics
+    let noteRaw = createTimelineNote(timeline.currentNote);
+
+    // TODO: Add the stuff that you think is relevent to the note!
+    // This will be put in the timeline object
+    let newNote = {
+        noteEl : noteRaw.noteEl,
+        noteData: null
+    };
+
+    // Deleteing the note
+    noteRaw.deleteTrigger.addEventListener("click", () => {
+        timeline.remove(newNote);
+        newNote.noteEl.remove();
+    });
+
+    // Inserting the note inbwetween two notes
+    noteRaw.insertTrigger.addEventListener("click", () => {
+        registerTimelineNote(timeline.editor.indexOf(newNote));
+    });
+
+    // Add the note to the timeline
+    timeline.insert(newNote, pos);
+    
+    // Scroll timeline to the end
+    if(pos == null)
+        timeline.el.scrollLeft = timeline.el.scrollWidth;
+
+    /**
+     * Creates the note for the timeline with all the necessary methods
+     * @param {Object} noteData As MUSIC_NOTES and boolean if it's dotted
+     */
+    function createTimelineNote(noteData){
+        console.log('creating note');
+        console.log(noteData);
+
+        // Creating graphics
+        let note = document.createElement("div");
+        note.classList.add("item-box");
+
+        // If dotted, add styling
+        if(noteData.dotted) note.classList.add("dotted");
+        
+        // Setup image
+        let imgNote = document.createElement("img");
+        imgNote.src = noteData.note.img;
+        imgNote.classList.add("item");
+
+        // Action area
+        let insertActionArea = document.createElement("div");
+        insertActionArea.classList.add("insert-action");
+        
+        note.appendChild(insertActionArea);
+        note.appendChild(imgNote);
+
+        // Styling, when the cursor is over the insert action area but not over the note, change the cursor
+        insertActionArea.addEventListener("mouseover", () => {
+            note.classList.add("between");
+        });
+        insertActionArea.addEventListener("mouseout", () => {
+            note.classList.remove("between");
+        });
+
+
+        return {
+            noteEl: note,                    // Node element
+            insertTrigger: insertActionArea, // Clicking on this area should insert a note
+            deleteTrigger: imgNote           // Clicking on the note icon should delete a note
+        };
     }
 }

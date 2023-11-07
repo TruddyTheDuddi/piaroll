@@ -36,6 +36,7 @@ h1,h2,h3,p{
     display: flex;
     gap: 2em;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .selector{
@@ -86,9 +87,10 @@ h1,h2,h3,p{
     display: flex;
     position: relative;
     border-radius: 1em;
+    overflow-x: scroll
 }
 
-.timeline::before{
+/* .timeline::before{
     content: '';
     position: absolute;
     height: 1.7px;
@@ -96,4 +98,64 @@ h1,h2,h3,p{
     width: 100%;
     bottom: 50%;
     transform: translateY(-50%);
+} */
+
+.timeline .item-box{
+    display: grid;
+    align-self: center;
+    padding: 0.8em;
+    border-left: 3px solid transparent;
+    position: relative;
+}
+
+.timeline .item-box.between{
+    border-left: 3px solid rgb(35, 114, 250);
+}
+
+.timeline .item-box.dotted::after{
+    content: '.';
+    position: absolute;
+    font-size: 3em;
+    right: 0.1em;
+    bottom: 0em;
+}
+
+.timeline .item-box .insert-action{
+    position: absolute;
+    border-radius: 0.25em;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.timeline .item-box .item{
+    display: grid;
+    height: 4em;
+    min-width: 2.5em;
+    filter: drop-shadow(2px 0px 0px rgb(245,245,245)) drop-shadow(-2px 0px 0px rgb(245,245,245));
+    cursor: pointer;
+    z-index: 1;
+    transition: opacity 0.15s;
+}
+
+.timeline .item-box .item:hover{
+    opacity: 0.5;
+    transition: opacity 0s;
+}
+
+.timeline .item-adder{
+    display: grid;
+    place-items: center;
+    padding: 0.8em;
+    max-width: 100%;
+    width: 100%;
+    min-width: 6em;
+    border-left: 3px solid transparent;
+    margin: 1em;
+    transition: 0.15s border-left;
+}
+
+.timeline .item-adder:hover{
+    border-left-color: rgb(35, 114, 250);
+    transition: 0s border-left;
 }

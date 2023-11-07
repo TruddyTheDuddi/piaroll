@@ -14,7 +14,7 @@
         <p>When you are done, you can click <b>render</b> to show what the transcribed standard notation would look like. You can also <b>play</b> your rhythmic pattern to hear if it matches the song.</p>
     </div>
 
-    <div class="editor">
+    <div class="editor" id="editor">
         <div class="selector-holder">
             <div>
                 <h3>Notes</h3>
@@ -24,10 +24,17 @@
                 <h3>Rests</h3>
                 <div id="rests" class="selector"></div>
             </div>
+            <div>
+                <label>
+                    <input type="checkbox" name="dotted" id="dotter" autocomplete="off"> Dotted (WIP)
+                </label>
+            </div>
         </div>
 
         <h3>Timeline</h3>
-        <div class="timeline"></div>
+        <div class="timeline" id="timeline">
+            <div class="item-adder" id="symbolAdder"></div>
+        </div>
     </div>
 
     <div>
