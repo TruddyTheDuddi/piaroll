@@ -136,7 +136,7 @@ function draw_bars(elements) {
         if (element == null) {
             return "|";
         } else {
-            const note = element.source.noteType == NOTE_TYPE.NOTE ? "G" : "z"
+            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z"
             const [num, den] = element.length.length;
             const prefix = currentSource === element.source ? "-" : ""
             currentSource = element.source;
@@ -149,7 +149,7 @@ function render() {
     // TODO try to split groups of notes
     const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
     const noteString = draw_bars(notes);
-    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:C\nM:C\n" + noteString);
+    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:perc stafflines=1\nM:C\nV:v stem=up\n" + noteString);
 }
 
 const LENGTHS = {
