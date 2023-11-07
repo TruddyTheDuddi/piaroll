@@ -33,14 +33,18 @@
             </div>
         </div>
 
-	<div class="bpm" id="bpm">
-            <input id="bpminput" type="number" value="80"></input>
-        </div>
-
         <h3>Timeline</h3>
         <div class="timeline" id="timeline">
             <div class="item-adder" id="symbolAdder"></div>
         </div>
+
+	<div class="tempo" id="tempo">
+	  <!-- TODO we should do a conversion from the value to the name (e.g., andante) -->
+          BPM: <input id="bpminput" type="number" value="80"></input>
+	  Metre: <input id="metrenuminput" type="number" value="4"></input>/<input id="metredeninput" type="number" value="4"></input>
+	  <!-- Add as well a dropdown for the time signature (4/4 vs 3/4 etc.) -->
+        </div>
+
 
         <h3>Result</h3>
         <div id="render">

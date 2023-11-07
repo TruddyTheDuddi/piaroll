@@ -129,6 +129,7 @@ function fit_notes(notes, bar_pos, bar_len) {
     return out;
 }
 
+// FIXME attend to the time signature to check where to put the bars (right now hardcoded to 4/4)
 function draw_bars(elements) {
     let currentSource = null;
 
@@ -163,7 +164,9 @@ function render() {
     
     const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
     var bpm = document.getElementById('bpminput').value;
-    const static_part = "X:1\nQ:"+bpm+"\nL:4/4\nK:perc stafflines=1\nM:C\nV:v stem=up\n";
+    var metrenum = document.getElementById('metrenuminput').value;
+    var metreden = document.getElementById('metredeninput').value;
+    const static_part = "X:1\nQ:"+bpm+"\nL:1/1\nM:"+metrenum+"/"+metreden+"\nK:perc stafflines=1\nV:v stem=up\n";
     const noteString = draw_bars(notes);
     var visualObj = window.ABCJS.renderAbc("renderoutput", static_part + noteString);
     var createSynth = new ABCJS.synth.CreateSynth();
@@ -307,10 +310,12 @@ dotter.addEventListener("click", () => {
 
 var bpm_input = document.getElementById("bpminput");
 bpm_input.addEventListener("change", () => {render()});
-// const bpm = document.getElementById('bpminput').value;
-// bpm.addEventListener("click", () => {
-//     render();
-// });
+
+var metrenum_input = document.getElementById("metrenuminput");
+metrenum_input.addEventListener("change", () => {render()});
+
+var metreden_input = document.getElementById("metredeninput");
+metreden_input.addEventListener("change", () => {render()});
 
 
 /**
