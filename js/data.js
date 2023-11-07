@@ -247,6 +247,10 @@ function registerTimelineNote(pos = null){
 
     // Add the note to the timeline
     timeline.insert(newNote, pos);
+    
+    // Scroll timeline to the end
+    if(pos == null)
+        timeline.el.scrollLeft = timeline.el.scrollWidth;
 
     /**
      * Creates the note for the timeline with all the necessary methods
