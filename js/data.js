@@ -135,8 +135,9 @@ function draw_bars(elements) {
             return "|";
         } else {
             // TODO ligature for same source
+            const note = element.source.noteType == NOTE_TYPE.NOTE ? "G" : "z"
             const [num, den] = element.length.length;
-            return "G" + num + "/" + den;
+            return note + num + "/" + den;
         }
     }).join("");
 }
@@ -393,6 +394,7 @@ function registerTimelineNote(pos = null){
     // This will be put in the timeline object
     let newNote = {
         noteEl : noteRaw.noteEl,
+        noteType: timeline.currentNote.note.type,
         length: createTimelineLength(timeline.currentNote),
     };
 
