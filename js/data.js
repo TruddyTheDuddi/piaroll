@@ -354,6 +354,7 @@ let timeline = {
             this.editor.splice(pos, 0, note);
             this.el.insertBefore(note.noteEl, this.el.children[pos]);
         }
+        render();
     },
 
     // Remove a note from the timeline
@@ -362,6 +363,7 @@ let timeline = {
         if(index > -1){
             this.editor.splice(index, 1);
         }
+        render();
     },
 
     // Clear the timeline (doesn't work because it will also remove editor element, fix later)
@@ -393,6 +395,10 @@ function registerTimelineNote(pos = null){
         noteEl : noteRaw.noteEl,
         length: createTimelineLength(timeline.currentNote),
     };
+
+    if (timeline.currentNote.dotted) {
+        newNote.length = newNote.length.dotted();
+    }
 
     // Deleteing the note
     noteRaw.deleteTrigger.addEventListener("click", () => {
