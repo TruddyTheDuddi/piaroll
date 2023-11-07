@@ -130,14 +130,17 @@ function fit_notes(notes, bar_pos, bar_len) {
 }
 
 function draw_bars(elements) {
+    let currentSource = null;
+
     return elements.map((element) => {
         if (element == null) {
             return "|";
         } else {
-            // TODO ligature for same source
             const note = element.source.noteType == NOTE_TYPE.NOTE ? "G" : "z"
             const [num, den] = element.length.length;
-            return note + num + "/" + den;
+            const prefix = currentSource === element.source ? "-" : ""
+            currentSource = element.source;
+            return prefix + note + num + "/" + den;
         }
     }).join("");
 }
@@ -397,10 +400,6 @@ function registerTimelineNote(pos = null){
         noteType: timeline.currentNote.note.type,
         length: createTimelineLength(timeline.currentNote),
     };
-
-    if (timeline.currentNote.dotted) {
-        newNote.length = newNote.length.dotted();
-    }
 
     // Deleteing the note
     noteRaw.deleteTrigger.addEventListener("click", () => {
