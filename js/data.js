@@ -147,9 +147,35 @@ function draw_bars(elements) {
 
 function render() {
     // TODO try to split groups of notes
+    var cursorControl = {}
+	var synthControl = new ABCJS.synth.SynthController();
+	synthControl.load("#audiooutput", 
+        cursorControl, 
+        {
+            displayLoop: true, 
+            displayRestart: true, 
+            displayPlay: true, 
+            displayProgress: true, 
+            displayWarp: true
+        }
+			 );
+    var audioParams = { chordsOff: true };
+    
     const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
+    const static_part = "X:1\nL:1/1\nK:perc stafflines=1\nM:C\nV:v stem=up\n";
     const noteString = draw_bars(notes);
-    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:perc stafflines=1\nM:C\nV:v stem=up\n" + noteString);
+    var visualObj = window.ABCJS.renderAbc("renderoutput", static_part + noteString);
+    var createSynth = new ABCJS.synth.CreateSynth();
+    createSynth.init({ visualObj: visualObj[0] }).then(function () {
+	synthControl.setTune(visualObj[0], false, audioParams).then(function () {
+	    console.log("Audio successfully loaded.")
+	}).catch(function (error) {
+	    console.warn("Audio problem:", error);
+	});
+    }).catch(function (error) {
+	console.warn("Audio problem:", error);
+    });
+    
 }
 
 const LENGTHS = {
@@ -424,8 +450,8 @@ function registerTimelineNote(pos = null){
      * @param {Object} noteData As MUSIC_NOTES and boolean if it's dotted
      */
     function createTimelineNote(noteData){
-        console.log('creating note');
-        console.log(noteData);
+        // console.log('creating note');
+        // console.log(noteData);
 
         // Creating graphics
         let note = document.createElement("div");
