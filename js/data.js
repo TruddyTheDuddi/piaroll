@@ -129,7 +129,6 @@ function fit_notes(notes, bar_pos, bar_len) {
     return out;
 }
 
-// Used in the VexFlow notation
 const LENGTHS = {
     whole: noteLength({
         name: "1",
@@ -370,11 +369,10 @@ function registerTimelineNote(pos = null){
     // Create the note graphics
     let noteRaw = createTimelineNote(timeline.currentNote);
 
-    // TODO: Add the stuff that you think is relevent to the note!
     // This will be put in the timeline object
     let newNote = {
         noteEl : noteRaw.noteEl,
-        noteData: null
+        length: createTimelineLength(timeline.currentNote),
     };
 
     // Deleteing the note
@@ -436,5 +434,13 @@ function registerTimelineNote(pos = null){
             insertTrigger: insertActionArea, // Clicking on this area should insert a note
             deleteTrigger: imgNote           // Clicking on the note icon should delete a note
         };
+    }
+
+    function createTimelineLength(current) {
+        if (current.dotted) {
+            return current.note.duration.dotted();
+        } else {
+            return current.note.duration;
+        }
     }
 }
