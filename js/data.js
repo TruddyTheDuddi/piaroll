@@ -149,28 +149,41 @@ function draw_bars(elements) {
 function render() {
     // TODO try to split groups of notes
     var cursorControl = {}
-	var synthControl = new ABCJS.synth.SynthController();
-	synthControl.load("#audiooutput", 
-        cursorControl, 
-        {
-            displayLoop: true, 
-            displayRestart: true, 
-            displayPlay: true, 
-            displayProgress: true, 
-            displayWarp: true
-        }
-			 );
+    var synthControl = new ABCJS.synth.SynthController();
+    // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
+    synthControl.load("#audiooutput",
+		      cursorControl,
+		      {
+			  displayLoop: true,
+			  displayRestart: true,
+			  displayPlay: true,
+			  displayProgress: true,
+			  // displayWarp: true
+		      }
+		     );
     var audioParams = { chordsOff: true };
     
     const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
     var bpm = document.getElementById('bpminput').value;
-    var metrenum = document.getElementById('metrenuminput').value;
-    var metreden = document.getElementById('metredeninput').value;
-    const static_part = "X:1\nQ:"+bpm+"\nL:1/1\nM:"+metrenum+"/"+metreden+"\nK:perc stafflines=1\nV:v stem=up\n";
+    var metrenum = document.getElementById('metrenuminput');
+    var metreden = document.getElementById('metredeninput');
+    if (metrenum.value < metrenum.min || metreden.value < metrenum.min) {
+	const result = document.getElementById('renderoutput')
+	result.innerHTML = "The metre elements should be 1 or greater";
+	return;
+    }
+
+    const static_part = "X:1\nQ:"+bpm+"\nL:1/1\nM:"+metrenum.value+"/"+metreden.value+"\nK:perc\nV:v stem=up clef=perc stafflines=1\n%%MIDI drummap B 52 %chinese cymbal\n";
     const noteString = draw_bars(notes);
-    var visualObj = window.ABCJS.renderAbc("renderoutput", static_part + noteString);
+    var to_render = static_part + noteString + "|]";
+    var visualObj = window.ABCJS.renderAbc("renderoutput", to_render); // FIXME when the bar is complete it shows a double bar
     var createSynth = new ABCJS.synth.CreateSynth();
-    createSynth.init({ visualObj: visualObj[0] }).then(function () {
+    createSynth.init({
+	visualObj: visualObj[0],
+	options: {
+	    soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
+	}
+    }).then(function () {
 	synthControl.setTune(visualObj[0], false, audioParams).then(function () {
 	    console.log("Audio successfully loaded.")
 	}).catch(function (error) {
@@ -309,13 +322,13 @@ dotter.addEventListener("click", () => {
 });
 
 var bpm_input = document.getElementById("bpminput");
-bpm_input.addEventListener("change", () => {render()});
+bpm_input.addEventListener("change", () => {render();});
 
 var metrenum_input = document.getElementById("metrenuminput");
-metrenum_input.addEventListener("change", () => {render()});
+metrenum_input.addEventListener("change", () => {render();});
 
 var metreden_input = document.getElementById("metredeninput");
-metreden_input.addEventListener("change", () => {render()});
+metreden_input.addEventListener("change", () => {render();});
 
 
 /**
