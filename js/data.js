@@ -162,7 +162,8 @@ function render() {
     var audioParams = { chordsOff: true };
     
     const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
-    const static_part = "X:1\nL:1/1\nK:perc stafflines=1\nM:C\nV:v stem=up\n";
+    var bpm = document.getElementById('bpminput').value;
+    const static_part = "X:1\nQ:"+bpm+"\nL:4/4\nK:perc stafflines=1\nM:C\nV:v stem=up\n";
     const noteString = draw_bars(notes);
     var visualObj = window.ABCJS.renderAbc("renderoutput", static_part + noteString);
     var createSynth = new ABCJS.synth.CreateSynth();
@@ -303,6 +304,14 @@ const dotter = document.getElementById("dotter"); //checkbox
 dotter.addEventListener("click", () => {
     timeline.currentNote.dotted = dotter.checked;
 });
+
+var bpm_input = document.getElementById("bpminput");
+bpm_input.addEventListener("change", () => {render()});
+// const bpm = document.getElementById('bpminput').value;
+// bpm.addEventListener("click", () => {
+//     render();
+// });
+
 
 /**
  * Creates the note selector by adding the notes and rests
