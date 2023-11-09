@@ -132,7 +132,6 @@ function fit_notes(notes, bar_pos, bar_len) {
     return out;
 }
 
-// FIXME attend to the time signature to check where to put the bars (right now hardcoded to 4/4)
 function draw_bars(elements) {
     let currentSource = null;
 
@@ -175,7 +174,6 @@ function render() {
 		     );
     var audioParams = { chordsOff: true };
     
-    // const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
     const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
 
     const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
@@ -339,7 +337,7 @@ metrenum_input.addEventListener("change", () => {
 	result.innerHTML = "The metre elements should be 1 or greater";
 	return;
     }
-    timeline.timeSignature[0] = metrenum_input.value;
+    timeline.timeSignature[0] = Number(metrenum_input.value);
     render();
 });
 
@@ -350,7 +348,7 @@ metreden_input.addEventListener("change", () => {
 	result.innerHTML = "The metre elements should be 1 or greater";
 	return;
     }
-    timeline.timeSignature[1] = metreden_input.value;
+    timeline.timeSignature[1] = Number(metreden_input.value);
     render();
 });
 
