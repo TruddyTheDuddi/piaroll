@@ -177,7 +177,10 @@ function render() {
     const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
 
     const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
-    const static_part = "X:1\nQ:"+timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\nV:v stem=up clef=perc stafflines=1\n%%MIDI drummap B 52 %chinese cymbal\n";
+
+    var selection_instrument = document.getElementById('instrumentinput');
+    var instrument = "%%MIDI drummap B " + selection_instrument.value;
+    const static_part = "X:1\nQ:"+timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\nV:v stem=up clef=perc stafflines=1\n" + instrument + "\n";
     const noteString = draw_bars(notes);
     var to_render = static_part + noteString + "|]";
     var visualObj = window.ABCJS.renderAbc("renderoutput", to_render); // FIXME when the bar is complete it shows a double bar
@@ -222,7 +225,7 @@ const LENGTHS = {
     })
 }
 
-const LENGTHS_BY_DEN = {1: LENGTHS.whole, 2: LENGTHS.half, 4: LENGTHS.quarter, 8: LENGTHS.eighth, 16: LENGTHS.sixteenth}
+const LENGTHS_BY_DEN = {1: LENGTHS.whole, 2: LENGTHS.half, 4: LENGTHS.quarter, 8: LENGTHS.eighth, 16: LENGTHS.sixteenth};
 
 // Define the existing notes
 const MUSIC_NOTES = {
@@ -344,7 +347,7 @@ metrenum_input.addEventListener("change", () => {
 var metreden_input = document.getElementById("metredeninput");
 metreden_input.addEventListener("change", () => {
     if (metreden_input.value < metreden_input.min) {
-	const result = document.getElementById('renderoutput')
+	const result = document.getElementById('renderoutput');
 	result.innerHTML = "The metre elements should be 1 or greater";
 	return;
     }
@@ -352,6 +355,32 @@ metreden_input.addEventListener("change", () => {
     render();
 });
 
+const instruments = {
+    bass_drum_1: "36 %bass drum 1",
+    acoustic_snare: "38 %acoustic snare",
+    pedal_hi_hat: "44 %pedal hi-hat",
+    ride_cymbal_1: "51 %ride cymbal 1",
+    closed_hi_hat: "42 %closed hi hat",
+    crash_cymbal_1: "49 %crash cymbal 1",
+    chinese_cymbal: "52 %chinese cymbal",
+    high_tom: "50 %high tom",
+    hi_mid_tom: "48 %hi mid tom",
+    low_tom: "45 %low tom",
+    low_floor_tom: "41 %low floor tom"
+};
+
+const available_inst = Object.keys(instruments);
+
+const selection_instrument = document.getElementById('instrumentinput');
+available_inst.map( (element, i) => {
+    let opt = document.createElement("option");
+    opt.value = instruments[element];
+    opt.innerHTML = element;
+    selection_instrument.append(opt);
+});
+selection_instrument.addEventListener("change", () => {
+    render();
+});
 
 /**
  * Creates the note selector by adding the notes and rests
