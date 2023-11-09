@@ -114,16 +114,19 @@ function fit_notes(notes, bar_pos, bar_len) {
     let out = [];
     for (const note of notes) {
         const lens = note.length.align(bar_pos, bar_len);
-        for (const len of lens) {
-            out.push(len != null
-                ? { length: len, source: note }
-                : null);
-        }
-
-        bar_pos = lengthPlus(bar_pos, note.length.length);
-        bar_pos[0] = bar_pos[0] % bar_pos[1];
-        if (bar_pos[0] == 0) {
-            out.push(null);
+        for (let index = 0 ; index < lens.length ; index++) {
+            const len = lens[index]
+            if (len != null) {
+                bar_pos = lengthPlus(bar_pos, len.length);
+                out.push({
+                    length: len,
+                    source: note,
+                    hasNext: index < lens.length - 1,
+                })
+            } else {
+                bar_pos = [0, 1];
+                out.push(null);
+            }
         }
     }
     return out;
@@ -137,11 +140,20 @@ function draw_bars(elements) {
         if (element == null) {
             return "|";
         } else {
-            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z"
+            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
             const [num, den] = element.length.length;
-            const prefix = currentSource === element.source ? "-" : ""
+
+            let prefix = "";
+            let appendix = "";
+            if (element.hasNext) {
+                if (currentSource !== element.source) {
+                    prefix = "(";
+                }
+            } else if (currentSource === element.source) {
+                appendix = ")";
+            }
             currentSource = element.source;
-            return prefix + note + num + "/" + den;
+            return prefix + note + num + "/" + den + appendix;
         }
     }).join("");
 }
@@ -163,17 +175,11 @@ function render() {
 		     );
     var audioParams = { chordsOff: true };
     
-    const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
-    var bpm = document.getElementById('bpminput').value;
-    var metrenum = document.getElementById('metrenuminput');
-    var metreden = document.getElementById('metredeninput');
-    if (metrenum.value < metrenum.min || metreden.value < metrenum.min) {
-	const result = document.getElementById('renderoutput')
-	result.innerHTML = "The metre elements should be 1 or greater";
-	return;
-    }
+    // const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
+    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
 
-    const static_part = "X:1\nQ:"+bpm+"\nL:1/1\nM:"+metrenum.value+"/"+metreden.value+"\nK:perc\nV:v stem=up clef=perc stafflines=1\n%%MIDI drummap B 52 %chinese cymbal\n";
+    const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
+    const static_part = "X:1\nQ:"+timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\nV:v stem=up clef=perc stafflines=1\n%%MIDI drummap B 52 %chinese cymbal\n";
     const noteString = draw_bars(notes);
     var to_render = static_part + noteString + "|]";
     var visualObj = window.ABCJS.renderAbc("renderoutput", to_render); // FIXME when the bar is complete it shows a double bar
@@ -192,7 +198,6 @@ function render() {
     }).catch(function (error) {
 	console.warn("Audio problem:", error);
     });
-    
 }
 
 const LENGTHS = {
@@ -322,13 +327,32 @@ dotter.addEventListener("click", () => {
 });
 
 var bpm_input = document.getElementById("bpminput");
-bpm_input.addEventListener("change", () => {render();});
+bpm_input.addEventListener("change", () => {
+    timeline.bpm = bpm_input.value;
+    render();
+});
 
 var metrenum_input = document.getElementById("metrenuminput");
-metrenum_input.addEventListener("change", () => {render();});
+metrenum_input.addEventListener("change", () => {
+    if (metrenum_input.value < metrenum_input.min) {
+	const result = document.getElementById('renderoutput')
+	result.innerHTML = "The metre elements should be 1 or greater";
+	return;
+    }
+    timeline.timeSignature[0] = metrenum_input.value;
+    render();
+});
 
 var metreden_input = document.getElementById("metredeninput");
-metreden_input.addEventListener("change", () => {render();});
+metreden_input.addEventListener("change", () => {
+    if (metreden_input.value < metreden_input.min) {
+	const result = document.getElementById('renderoutput')
+	result.innerHTML = "The metre elements should be 1 or greater";
+	return;
+    }
+    timeline.timeSignature[1] = metreden_input.value;
+    render();
+});
 
 
 /**
@@ -433,7 +457,10 @@ let timeline = {
     currentNote: {
         note: MUSIC_NOTES.quarter,
         dotted: false,
-    }
+    },
+
+    timeSignature: [4, 4],
+    bpm: 80,
 };
 
 
