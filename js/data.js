@@ -116,19 +116,17 @@ function fit_notes(notes, bar_pos, bar_len) {
         const lens = note.length.align(bar_pos, bar_len);
         for (let index = 0 ; index < lens.length ; index++) {
             const len = lens[index]
-            out.push(len != null
-                ? {
+            if (len != null) {
+                bar_pos = lengthPlus(bar_pos, len.length);
+                out.push({
                     length: len,
                     source: note,
                     hasNext: index < lens.length - 1,
-                }
-                : null);
-        }
-
-        bar_pos = lengthPlus(bar_pos, note.length.length);
-        bar_pos[0] = bar_pos[0] % bar_pos[1];
-        if (bar_pos[0] == 0) {
-            out.push(null);
+                })
+            } else {
+                bar_pos = [0, 1];
+                out.push(null);
+            }
         }
     }
     return out;
@@ -161,9 +159,10 @@ function draw_bars(elements) {
 
 function render() {
     // TODO try to split groups of notes
-    const notes = fit_notes(timeline.editor, [0, 1], [1, 1]);
+    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
     const noteString = draw_bars(notes);
-    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:perc stafflines=1\nM:C\nV:v stem=up\n" + noteString);
+    const keyString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
+    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:perc stafflines=1\nM:" + keyString + "\nV:v stem=up\n" + noteString);
 }
 
 const LENGTHS = {
@@ -394,7 +393,9 @@ let timeline = {
     currentNote: {
         note: MUSIC_NOTES.quarter,
         dotted: false,
-    }
+    },
+
+    timeSignature: [4, 4],
 };
 
 
