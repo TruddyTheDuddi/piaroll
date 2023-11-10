@@ -133,8 +133,6 @@ function fit_notes(notes, bar_pos, bar_len) {
 }
 
 function draw_bars(elements) {
-    let currentSource = null;
-
     return elements.map((element) => {
         if (element == null) {
             return "|";
@@ -142,17 +140,8 @@ function draw_bars(elements) {
             const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
             const [num, den] = element.length.length;
 
-            let prefix = "";
-            let appendix = "";
-            if (element.hasNext) {
-                if (currentSource !== element.source) {
-                    prefix = "(";
-                }
-            } else if (currentSource === element.source) {
-                appendix = ")";
-            }
-            currentSource = element.source;
-            return prefix + note + num + "/" + den + appendix;
+            const appendix = element.hasNext ? "-" : "";
+            return note + num + "/" + den + appendix;
         }
     }).join("");
 }
