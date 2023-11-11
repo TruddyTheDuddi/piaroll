@@ -147,7 +147,8 @@ function draw_bars(elements) {
 }
 
 function render() {
-    // TODO try to split groups of notes
+    var old_render = document.getElementById("renderoutput");
+    old_render.innerHTML = "";
     var cursorControl = {}
     var synthControl = new ABCJS.synth.SynthController();
     // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
@@ -168,11 +169,15 @@ function render() {
     const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
 
     var selection_instrument = document.getElementById('instrumentinput');
-    var instrument = "%%MIDI drummap B " + selection_instrument.value;
-    const static_part = "X:1\nQ:"+timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\nV:v stem=up clef=perc stafflines=1\n" + instrument + "\n";
-    const noteString = draw_bars(notes);
-    var to_render = static_part + noteString + "|]";
-    var visualObj = window.ABCJS.renderAbc("renderoutput", to_render); // FIXME when the bar is complete it shows a double bar
+    var selection_song = document.getElementById('songinput');
+    const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
+    const voice_melody = selection_song.value == "" ? "" : "V:melody clef=treble\n";
+    const score = "%%score (perc) (melody)\n";
+    const static_part = "X:1\nQ:"+ timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\n" + score + voice_perc + voice_melody;
+    const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument.value + "] " + draw_bars(notes)  + "|]";
+    const other_voice = selection_song.value == "" ? "" : "[V:melody] " + selection_song.value  +"|]";
+    var to_render = static_part + other_voice + noteString;
+    var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
     var createSynth = new ABCJS.synth.CreateSynth();
     createSynth.init({
 	visualObj: visualObj[0],
@@ -345,8 +350,8 @@ metreden_input.addEventListener("change", () => {
 });
 
 const instruments = {
-    bass_drum_1: "36 %bass drum 1",
-    acoustic_snare: "38 %acoustic snare",
+    bass_drum_1: "36",
+    acoustic_snare: "38",
     pedal_hi_hat: "44 %pedal hi-hat",
     ride_cymbal_1: "51 %ride cymbal 1",
     closed_hi_hat: "42 %closed hi hat",
@@ -358,8 +363,12 @@ const instruments = {
     low_floor_tom: "41 %low floor tom"
 };
 
-const available_inst = Object.keys(instruments);
+const songs = {
+    none: "",
+    bella_ciao: "z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A"
+};
 
+const available_inst = Object.keys(instruments);
 const selection_instrument = document.getElementById('instrumentinput');
 available_inst.map( (element, i) => {
     let opt = document.createElement("option");
@@ -370,6 +379,19 @@ available_inst.map( (element, i) => {
 selection_instrument.addEventListener("change", () => {
     render();
 });
+
+const available_song = Object.keys(songs);
+const selection_song = document.getElementById('songinput');
+available_song.map( (element, i) => {
+    let opt = document.createElement("option");
+    opt.value = songs[element];
+    opt.innerHTML = element;
+    selection_song.append(opt);
+});
+selection_song.addEventListener("change", () => {
+    render();
+});
+
 
 /**
  * Creates the note selector by adding the notes and rests
