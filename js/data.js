@@ -400,6 +400,12 @@ const songs = {
 	bpm: "120",
 	metre: [4,4],
 	clef: "treble"
+    },
+    tetris: {
+	melody: "[K:C] [e'-e-E,,E,,,]/8[e'eB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'dE,,E,,,]/8[e'B,-G,-E,-]/16[d'B,G,E,]/16 [c'cE,,E,,,]/8[bBB,G,E,]/8| [a-A-A,,A,,,]/8[aACA,E,]/8 [aAA,,A,,,]/8[c'cA,E,C,]/8 [e'-e-A,,A,,,]/8[e'eCA,E,]/8 [d'dA,,A,,,]/8[c'cECA,]/8| [b-B-^G,,G,,,]/8[bBB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'-d-G,,G,,,]/8[d'dEB,G,E,]/8 [e'-e-E,,E,,,]/8[e'eEB,G,E,]/8| [c'cA,,A,,,]/8[cAECA,E,C,]/8 [aAA,,,A,,,,]/8[ecAECA,E,]/8 [aAA,,A,,,]/8[aecAECA,]/8 [aA,]/16[bB,]/16[c'C]/16[d'D]/16| [e'eEE,]/8[d'-d-A,,F,,D,,]/8 [d'dFD,]/8[f'fA,,F,,D,,]/8 [a'-a-AA,]/8[a'aA,,F,,D,,]/8 [g'gA,A,,]/8[f'fF,F,,]/8| [e'-e-C,C,,]/8[e'-e-CC,]/8 [e'eC,C,,]/8[c'cCC,]/8 [e'-e-C,C,,]/8[e'eCA,E,]/8 [d'dG,,G,,,]/8[c'cCA,E,]/8| [b-B-B,,B,,,]/8[bBB,B,,]/8 [bBB,,B,,,]/8[c'cB,B,,]/8 [d'-d-DD,]/8[d'dE,E,,]/8 [e'-e-B,^G,E,]/8[e'eG,G,,]/8| [c'-c-A,,A,,,]/8[c'cA,E,C,]/8 [a-A-A,,A,,,]/8[aACA,E,]/8 [a-A-A,,A,,,]/8[aAECA,]/8 z/4|",
+	bpm: "160",
+	metre: [4,4],
+	clef: "treble"
     }
 };
 
