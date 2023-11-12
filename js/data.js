@@ -352,15 +352,15 @@ metreden_input.addEventListener("change", () => {
 const instruments = {
     bass_drum_1: "36",
     acoustic_snare: "38",
-    pedal_hi_hat: "44 %pedal hi-hat",
-    ride_cymbal_1: "51 %ride cymbal 1",
-    closed_hi_hat: "42 %closed hi hat",
-    crash_cymbal_1: "49 %crash cymbal 1",
-    chinese_cymbal: "52 %chinese cymbal",
-    high_tom: "50 %high tom",
-    hi_mid_tom: "48 %hi mid tom",
-    low_tom: "45 %low tom",
-    low_floor_tom: "41 %low floor tom"
+    pedal_hi_hat: "44",
+    ride_cymbal_1: "51",
+    closed_hi_hat: "42",
+    crash_cymbal_1: "49",
+    chinese_cymbal: "52",
+    high_tom: "50",
+    hi_mid_tom: "48",
+    low_tom: "45",
+    low_floor_tom: "41"
 };
 
 const available_inst = Object.keys(instruments);
