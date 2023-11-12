@@ -171,11 +171,11 @@ function render() {
     var selection_instrument = document.getElementById('instrumentinput');
     var selection_song = document.getElementById('songinput');
     const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
-    const voice_melody = selection_song.value == "freestyle" ? "" : "V:melody clef=treble\n";
+    const voice_melody = selection_song.value == "freestyle" ? "" : "V:melody clef=" + songs[selection_song.value].clef + "\n";
     const score = "%%score (perc) (melody)\n";
     const static_part = "X:1\nQ:"+ timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\n" + score + voice_perc + voice_melody;
     const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument.value + "] " + draw_bars(notes)  + "|]";
-    const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody] " + songs[selection_song.value].melody  +"|]";
+    const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody]  " + songs[selection_song.value].melody  +"|]";
     var to_render = static_part + other_voice + noteString;
     var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
     var createSynth = new ABCJS.synth.CreateSynth();
@@ -378,10 +378,29 @@ selection_instrument.addEventListener("change", () => {
 const songs = {
     freestyle: {},
     bella_ciao: {
-	melody: "z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A",
+	melody: "[K:C] z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A",
 	bpm: "140",
-	metre: [4,4]
+	metre: [4,4],
+	clef: "treble"
     },
+    viva_la_vida: {
+	melody: "[K:Ab] [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 [E G,]/8 | z/8 [E G,]/8 z/8 [E G,]/8 z/8 [E G,]/8 E/8 [E G,]/8 | [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 [C F,]/8|  z/8 [C F,]/8  z/8 [C F,]/8  [C F,]/8 C/8  [C F,]/8 z/8",
+	bpm: "128",
+	metre: [4,4],
+	clef: "treble"
+    },
+    another_one_bites_the_dust: {
+	melody: "[K:C octave=-1] [I:MIDI=program 34] z3/8F,/16z3/16F,/16z3/16F,/16z/16| z2/8 z/16F,/16F,/16z/16 F,/8^G,/8 F,/16^A,/8z/16| z3/8F,/16z3/16F,/16z3/16F,/16z/16| z2/8 z/16F,/16F,/16z/16 F,/8^G,/8 F,/16^A,/8z/16|",
+	bpm: "110",
+	metre: [4,4],
+	clef: "bass"
+    },
+    pallet_town: {
+	melody: "[K:G] [dG,-]/8[cG,-]/8 [BG,]/8[AE,-]/8 [gE,-]/8[eE,]/8 [fF,-]/8[eF,]/8| [dG,]3/8[BA,-]/8 [GA,-]/8[GA,]/8 [AG,-]/8[BG,]/8| [c-E,]3/8[cF,-]2/8[FF,]/8 [GE,-]/8[AE,]/8| [BG,]3/8[cE,-]/16[BE,-]/16 [A-E,]2/8 [AD,]2/8|",
+	bpm: "120",
+	metre: [4,4],
+	clef: "treble"
+    }
 };
 
 const available_song = Object.keys(songs);
