@@ -171,11 +171,11 @@ function render() {
     var selection_instrument = document.getElementById('instrumentinput');
     var selection_song = document.getElementById('songinput');
     const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
-    const voice_melody = selection_song.value == "" ? "" : "V:melody clef=treble\n";
+    const voice_melody = selection_song.value == "freestyle" ? "" : "V:melody clef=treble\n";
     const score = "%%score (perc) (melody)\n";
     const static_part = "X:1\nQ:"+ timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\n" + score + voice_perc + voice_melody;
     const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument.value + "] " + draw_bars(notes)  + "|]";
-    const other_voice = selection_song.value == "" ? "" : "[V:melody] " + selection_song.value  +"|]";
+    const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody] " + songs[selection_song.value].melody  +"|]";
     var to_render = static_part + other_voice + noteString;
     var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
     var createSynth = new ABCJS.synth.CreateSynth();
@@ -363,11 +363,6 @@ const instruments = {
     low_floor_tom: "41 %low floor tom"
 };
 
-const songs = {
-    none: "",
-    bella_ciao: "z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A"
-};
-
 const available_inst = Object.keys(instruments);
 const selection_instrument = document.getElementById('instrumentinput');
 available_inst.map( (element, i) => {
@@ -380,15 +375,41 @@ selection_instrument.addEventListener("change", () => {
     render();
 });
 
+const songs = {
+    freestyle: {},
+    bella_ciao: {
+	melody: "z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A",
+	bpm: "140",
+	metre: [4,4]
+    },
+};
+
 const available_song = Object.keys(songs);
 const selection_song = document.getElementById('songinput');
 available_song.map( (element, i) => {
     let opt = document.createElement("option");
-    opt.value = songs[element];
+    opt.value = element;
     opt.innerHTML = element;
     selection_song.append(opt);
 });
-selection_song.addEventListener("change", () => {
+selection_song.addEventListener("change", function() {
+    if (this.value == "freestyle") {
+	bpm_input.disabled = false;
+	metrenum_input.disabled = false;
+	metreden_input.disabled = false;
+    } else {
+	bpm_input.value = songs[this.value].bpm;
+	timeline.bpm = bpm_input.value;
+	bpm_input.disabled = true;
+
+	timeline.timeSignature[0] = songs[this.value].metre[0];
+	timeline.timeSignature[1] = songs[this.value].metre[1];
+	metrenum_input.value = timeline.timeSignature[0].toString();
+	metreden_input.value = timeline.timeSignature[1].toString();
+	metrenum_input.disabled = true;
+	metreden_input.disabled = true;
+    }
+
     render();
 });
 
