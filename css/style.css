@@ -1,3 +1,11 @@
+:root{
+    --text: rgb(49, 55, 74);
+    --text_fade: rgba(49, 55, 74, 0.5);
+    --background: rgb(249, 249, 249);
+    --border: rgb(235, 235, 235);
+}
+
+
 @font-face {
     font-family: 'Poppins';
     src: url('../font/Poppins-Regular.ttf');
@@ -14,6 +22,8 @@ body{
     display: grid;
     gap: 2em;
     margin: 2em;
+    background-color: var(--background);
+    color: var(--text);
 }
 
 h1,h2,h3,p{
@@ -33,10 +43,37 @@ h1,h2,h3,p{
 }
 
 .selector-holder{
+    display: grid;
+    filter: drop-shadow(1.5px 1.5px 3px rgba(0,0,0,0.1));
+    margin-right: auto;
+}
+
+.selector-holder .tabs{
     display: flex;
-    gap: 2em;
-    flex-wrap: wrap;
-    align-items: center;
+    gap: 0.3em;
+    margin-left: 1.25em;
+    z-index: 1;
+    margin-bottom: -2px;
+    color: var(--text_fade);
+}
+
+.selector-holder .tabs>div{
+    padding: 0.5em 0.8em;
+    border-radius: 0.5em 0.5em 0 0;
+    border-bottom: none;
+}
+
+.selector-holder .tabs>div.selected{
+    background-color: white;
+    box-shadow: none;
+}
+
+.selector-holder .content{
+    display: grid;
+    gap: 1em;
+    padding: 1em;
+    border-radius: 0.5em;
+    background-color: white;
 }
 
 .selector{
@@ -48,7 +85,7 @@ h1,h2,h3,p{
     display: grid;
     padding: 0.5em;
     border-radius: 0.5em;
-    /* background-color: rgba(0,0,0,0.05); */
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     cursor: pointer;
 }
 .selector .select-box img{
@@ -75,6 +112,7 @@ h1,h2,h3,p{
 .selector .select-box.selected{
     background-color: rgb(35, 114, 250);
     transition: 0.1s;
+    box-shadow: none;
 }
 
 .selector .select-box.selected img{

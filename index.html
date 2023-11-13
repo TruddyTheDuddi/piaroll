@@ -16,19 +16,29 @@
 
     <div class="editor" id="editor">
         <div class="selector-holder">
-            <div>
-                <h3>Notes</h3>
+
+            <div class="tabs">
+                <div id="notesTab" class="selected">Notes</div>
+                <div id="restsTab">Rests</div>
+            </div>
+
+            <div class="content">
                 <div id="notes" class="selector"></div>
+                <!-- <div id="rests" class="selector"></div> -->
+                <div class="desc">
+                    <h3>Whole</h3>
+                    <span>
+                        <span>Semibreve</span>
+                        <span class="timing">1/1</span>
+                    </span>
+                </div>
             </div>
-            <div>
-                <h3>Rests</h3>
-                <div id="rests" class="selector"></div>
-            </div>
-            <div>
+
+            <!-- <div>
                 <label>
                     <input type="checkbox" name="dotted" id="dotter" autocomplete="off"> Dotted (WIP)
                 </label>
-            </div>
+            </div> -->
         </div>
 
         <h3>Timeline</h3>
