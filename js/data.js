@@ -114,19 +114,55 @@ function fit_notes(notes, bar_pos, bar_len) {
     let out = [];
     for (const note of notes) {
         const lens = note.length.align(bar_pos, bar_len);
-        for (const len of lens) {
-            out.push(len != null
-                ? { length: len, source: note }
-                : null);
-        }
-
-        bar_pos = lengthPlus(bar_pos, note.length.length);
-        bar_pos[0] = bar_pos[0] % bar_pos[1];
-        if (bar_pos[0] == 0) {
-            out.push(null);
+        for (let index = 0 ; index < lens.length ; index++) {
+            const len = lens[index]
+            if (len != null) {
+                bar_pos = lengthPlus(bar_pos, len.length);
+                out.push({
+                    length: len,
+                    source: note,
+                    hasNext: index < lens.length - 1,
+                })
+            } else {
+                bar_pos = [0, 1];
+                out.push(null);
+            }
         }
     }
     return out;
+}
+
+function draw_bars(elements) {
+    let currentSource = null;
+
+    return elements.map((element) => {
+        if (element == null) {
+            return "|";
+        } else {
+            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
+            const [num, den] = element.length.length;
+
+            let prefix = "";
+            let appendix = "";
+            if (element.hasNext) {
+                if (currentSource !== element.source) {
+                    prefix = "(";
+                }
+            } else if (currentSource === element.source) {
+                appendix = ")";
+            }
+            currentSource = element.source;
+            return prefix + note + num + "/" + den + appendix;
+        }
+    }).join("");
+}
+
+function render() {
+    // TODO try to split groups of notes
+    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
+    const noteString = draw_bars(notes);
+    const keyString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
+    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:perc stafflines=1\nM:" + keyString + "\nV:v stem=up\n" + noteString);
 }
 
 const LENGTHS = {
@@ -335,6 +371,7 @@ let timeline = {
             this.editor.splice(pos, 0, note);
             this.el.insertBefore(note.noteEl, this.el.children[pos]);
         }
+        render();
     },
 
     // Remove a note from the timeline
@@ -343,6 +380,7 @@ let timeline = {
         if(index > -1){
             this.editor.splice(index, 1);
         }
+        render();
     },
 
     // Clear the timeline (doesn't work because it will also remove editor element, fix later)
@@ -355,7 +393,9 @@ let timeline = {
     currentNote: {
         note: MUSIC_NOTES.quarter,
         dotted: false,
-    }
+    },
+
+    timeSignature: [4, 4],
 };
 
 
@@ -372,6 +412,7 @@ function registerTimelineNote(pos = null){
     // This will be put in the timeline object
     let newNote = {
         noteEl : noteRaw.noteEl,
+        noteType: timeline.currentNote.note.type,
         length: createTimelineLength(timeline.currentNote),
     };
 
