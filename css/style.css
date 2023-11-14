@@ -395,6 +395,11 @@ input[type="number"]{
     pointer-events: none;
 }
 
+.timeline .hint.hide{
+    transition: opacity 5s;
+    opacity: 0;
+}
+
 .timeline .item-box{
     display: grid;
     align-self: center;
@@ -462,6 +467,8 @@ input[type="number"]{
     min-width: 6em;
     border-left: 3px solid transparent;
     margin: 1em;
+    position: relative;
+    z-index: 1;
     transition: 0.15s border-left;
 }
 

@@ -552,6 +552,8 @@ let timeline = {
 
     timeSignature: [4, 4],
     bpm: 80,
+
+    timelineHint: true
 };
 
 
@@ -562,6 +564,7 @@ symbolAdder.addEventListener("click", () => {
 });
 
 function registerTimelineNote(pos = null){
+    
     // Create the note graphics
     let noteRaw = createTimelineNote(timeline.currentNote);
 
@@ -589,6 +592,15 @@ function registerTimelineNote(pos = null){
     // Scroll timeline to the end
     if(pos == null)
         timeline.el.scrollLeft = timeline.el.scrollWidth;
+
+    // Trigger close hint
+    if(timeline.timelineHint){
+        timeline.timelineHint = false;
+        document.getElementById("timelineHint").classList.add("hide");
+        setTimeout(() => {
+            document.getElementById("timelineHint").remove();
+        }, 5000);
+    }
 
     /**
      * Creates the note for the timeline with all the necessary methods
