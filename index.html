@@ -17,62 +17,109 @@
     </div>
 
     <div class="editor" id="editor">
-        <div class="selector-holder">
+        <div class="toolbox">
+            <div class="tool-panel symbols">
 
-            <div class="tabs">
-                <div id="notesTab" class="selected">Notes</div>
-                <div id="restsTab">Rests</div>
+                <div class="tabs interact">
+                    <div id="notesTab" class="selected">Notes</div>
+                    <div id="restsTab">Rests</div>
+                </div>
+
+                <div class="content">
+                    <div id="notes" class="selector"></div>
+                    <div id="rests" class="selector hidden"></div>
+                    <div class="note-info">
+                        <div>
+                            <h3>Whole</h3>
+                            <span class="timing-holder">
+                                <span>Length value</span>
+                                <span class="timing" id="timing">1/4</span>
+                            </span>
+                        </div>
+                        <div style="display: grid;">
+                            <label class="dotter">
+                                <input type="checkbox" name="dotted" id="dotter" autocomplete="off"> Dotted
+                                <div><span></span></div>
+                            </label>
+                            <!-- <small style="text-align: right;">Length x1.5</small> -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="content">
-                <div id="notes" class="selector"></div>
-                <!-- <div id="rests" class="selector"></div> -->
-                <div class="desc">
-                    <h3>Whole</h3>
-                    <span>
-                        <span>Semibreve</span>
-                        <span class="timing">1/1</span>
-                    </span>
+
+            <div class="tool-panel middle">
+                <div class="content inline">
+
+                    <div id="audio">
+                        <div id="audiooutput"></div>
+                    </div>
+
+                    <div class="verti-sepa"></div>
+
+                    <div class="audio-settings">
+                        <div class="inputline">
+                            <span class="desc">
+                                Song selector
+                                <small>(Locks tempo settings)</small>
+                            </span>
+                            <select id="songinput">
+                            </select>
+                        </div>
+
+                        <div class="inputline">
+                            <span class="desc">
+                                Instrument
+                            </span>
+                            <select id="instrumentinput">
+                            </select>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- <div>
-                <label>
-                    <input type="checkbox" name="dotted" id="dotter" autocomplete="off"> Dotted (WIP)
-                </label>
-            </div> -->
+            <div class="tool-panel tempo">
+                <div class="tabs right">
+                    <div class="selected">Tempo Settings</div>
+                </div>
+            
+                <div class="content inline">
+                    <div class="inputline">
+                        <span class="desc">
+                            BPM
+                            <small>Beat per Minute</small>
+                        </span>
+                        <input id="bpminput" type="number" value="80"></input>
+                    </div>
+                    <div class="inputline">
+                        <span>
+                            Meter
+                        </span>
+                        <span class="metre">
+                            <input class="top input" id="metrenuminput" type="number" value="4" min="1"></input>
+                            <hr>
+                            <select class="low input" name="metre" id="metredeninput">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="4" selected>4</option>
+                                <option value="8">8</option>
+                                <option value="16">16</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <h3>Timeline</h3>
         <div class="timeline" id="timeline">
             <div class="item-adder" id="symbolAdder"></div>
+            <small class="hint" id="hint">Click here to add a note</small>
         </div>
 
-	<div class="tempo" id="tempo">
-	  <!-- TODO we should do a conversion from the value to the name (e.g., andante) -->
-          BPM: <input id="bpminput" type="number" value="80"></input><br>
-	  Metre: <input id="metrenuminput" type="number" value="4" min="1"></input>/<input id="metredeninput" type="number" value="4" min="1"></input>
-	  <!-- Add as well a dropdown for the time signature (4/4 vs 3/4 etc.) -->
-        </div>
-
-
-        <h3>Result</h3>
-        <div id="render">
-	    Song: 
-            <select id="songinput"></select>
-
-            <div id="renderoutput"></div>
-        </div>
-
-	<h3>Player</h3>
-        <div id="instrument">
-	    Instrument: 
-            <select id="instrumentinput"></select>
-        </div>
-
-        <div id="audio">
-            <div id="audiooutput"></div>
-        </div>
+        <div id="renderoutput"></div>
 
     </div>
 
