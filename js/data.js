@@ -390,7 +390,7 @@ const songs = {
 	clef: "treble"
     },
     another_one_bites_the_dust: {
-	melody: "[K:C octave=-1] [I:MIDI=program 34] z3/8F,/16z3/16F,/16z3/16F,/16z/16| z2/8 z/16F,/16F,/16z/16 F,/8^G,/8 F,/16^A,/8z/16| z3/8F,/16z3/16F,/16z3/16F,/16z/16| z2/8 z/16F,/16F,/16z/16 F,/8^G,/8 F,/16^A,/8z/16|",
+	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,/8z/16|",
 	bpm: "110",
 	metre: [4,4],
 	clef: "bass"
