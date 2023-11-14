@@ -159,3 +159,7 @@ h1,h2,h3,p{
     border-left-color: rgb(35, 114, 250);
     transition: 0s border-left;
 }
+
+input {
+    width: 3em;
+}

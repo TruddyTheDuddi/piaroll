@@ -133,8 +133,6 @@ function fit_notes(notes, bar_pos, bar_len) {
 }
 
 function draw_bars(elements) {
-    let currentSource = null;
-
     return elements.map((element) => {
         if (element == null) {
             return "|";
@@ -142,27 +140,59 @@ function draw_bars(elements) {
             const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
             const [num, den] = element.length.length;
 
-            let prefix = "";
-            let appendix = "";
-            if (element.hasNext) {
-                if (currentSource !== element.source) {
-                    prefix = "(";
-                }
-            } else if (currentSource === element.source) {
-                appendix = ")";
-            }
-            currentSource = element.source;
-            return prefix + note + num + "/" + den + appendix;
+            const appendix = element.hasNext ? "-" : "";
+            return note + num + "/" + den + appendix;
         }
     }).join("");
 }
 
 function render() {
-    // TODO try to split groups of notes
+    var old_render = document.getElementById("renderoutput");
+    old_render.innerHTML = "";
+    var cursorControl = {}
+    var synthControl = new ABCJS.synth.SynthController();
+    // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
+    synthControl.load("#audiooutput",
+		      cursorControl,
+		      {
+			  displayLoop: true,
+			  displayRestart: true,
+			  displayPlay: true,
+			  displayProgress: true,
+			  // displayWarp: true
+		      }
+		     );
+    var audioParams = { chordsOff: true };
+    
     const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
-    const noteString = draw_bars(notes);
-    const keyString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
-    window.ABCJS.renderAbc("renderoutput", "X:1\nL:1/1\nK:perc stafflines=1\nM:" + keyString + "\nV:v stem=up\n" + noteString);
+
+    const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
+
+    var selection_instrument = document.getElementById('instrumentinput');
+    var selection_song = document.getElementById('songinput');
+    const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
+    const voice_melody = selection_song.value == "freestyle" ? "" : "V:melody clef=" + songs[selection_song.value].clef + "\n";
+    const score = "%%score (perc) (melody)\n";
+    const static_part = "X:1\nQ:"+ timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\n" + score + voice_perc + voice_melody;
+    const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument.value + "] " + draw_bars(notes)  + "|]";
+    const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody]  " + songs[selection_song.value].melody  +"|]";
+    var to_render = static_part + other_voice + noteString;
+    var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
+    var createSynth = new ABCJS.synth.CreateSynth();
+    createSynth.init({
+	visualObj: visualObj[0],
+	options: {
+	    soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
+	}
+    }).then(function () {
+	synthControl.setTune(visualObj[0], false, audioParams).then(function () {
+	    console.log("Audio successfully loaded.")
+	}).catch(function (error) {
+	    console.warn("Audio problem:", error);
+	});
+    }).catch(function (error) {
+	console.warn("Audio problem:", error);
+    });
 }
 
 const LENGTHS = {
@@ -189,7 +219,7 @@ const LENGTHS = {
     })
 }
 
-const LENGTHS_BY_DEN = {1: LENGTHS.whole, 2: LENGTHS.half, 4: LENGTHS.quarter, 8: LENGTHS.eighth, 16: LENGTHS.sixteenth}
+const LENGTHS_BY_DEN = {1: LENGTHS.whole, 2: LENGTHS.half, 4: LENGTHS.quarter, 8: LENGTHS.eighth, 16: LENGTHS.sixteenth};
 
 // Define the existing notes
 const MUSIC_NOTES = {
@@ -290,6 +320,130 @@ const dotter = document.getElementById("dotter"); //checkbox
 dotter.addEventListener("click", () => {
     timeline.currentNote.dotted = dotter.checked;
 });
+
+var bpm_input = document.getElementById("bpminput");
+bpm_input.addEventListener("change", () => {
+    timeline.bpm = bpm_input.value;
+    render();
+});
+
+var metrenum_input = document.getElementById("metrenuminput");
+metrenum_input.addEventListener("change", () => {
+    if (metrenum_input.value < metrenum_input.min) {
+	const result = document.getElementById('renderoutput')
+	result.innerHTML = "The metre elements should be 1 or greater";
+	return;
+    }
+    timeline.timeSignature[0] = Number(metrenum_input.value);
+    render();
+});
+
+var metreden_input = document.getElementById("metredeninput");
+metreden_input.addEventListener("change", () => {
+    if (metreden_input.value < metreden_input.min) {
+	const result = document.getElementById('renderoutput');
+	result.innerHTML = "The metre elements should be 1 or greater";
+	return;
+    }
+    timeline.timeSignature[1] = Number(metreden_input.value);
+    render();
+});
+
+const instruments = {
+    bass_drum_1: "36",
+    acoustic_snare: "38",
+    pedal_hi_hat: "44",
+    ride_cymbal_1: "51",
+    closed_hi_hat: "42",
+    crash_cymbal_1: "49",
+    chinese_cymbal: "52",
+    high_tom: "50",
+    hi_mid_tom: "48",
+    low_tom: "45",
+    low_floor_tom: "41"
+};
+
+const available_inst = Object.keys(instruments);
+const selection_instrument = document.getElementById('instrumentinput');
+available_inst.map( (element, i) => {
+    let opt = document.createElement("option");
+    opt.value = instruments[element];
+    opt.innerHTML = element;
+    selection_instrument.append(opt);
+});
+selection_instrument.addEventListener("change", () => {
+    render();
+});
+
+const songs = {
+    freestyle: {},
+    bella_ciao: {
+	melody: "[K:C] z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A",
+	bpm: "140",
+	metre: [4,4],
+	clef: "treble"
+    },
+    viva_la_vida: {
+	melody: "[K:Ab] [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 [E G,]/8 | z/8 [E G,]/8 z/8 [E G,]/8 z/8 [E G,]/8 E/8 [E G,]/8 | [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 [C F,]/8|  z/8 [C F,]/8  z/8 [C F,]/8  [C F,]/8 C/8  [C F,]/8 z/8",
+	bpm: "128",
+	metre: [4,4],
+	clef: "treble"
+    },
+    another_one_bites_the_dust: {
+	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,/8z/16|",
+	bpm: "110",
+	metre: [4,4],
+	clef: "bass"
+    },
+    pallet_town: {
+	melody: "[K:G] [dG,-]/8[cG,-]/8 [BG,]/8[AE,-]/8 [gE,-]/8[eE,]/8 [fF,-]/8[eF,]/8| [dG,]3/8[BA,-]/8 [GA,-]/8[GA,]/8 [AG,-]/8[BG,]/8| [c-E,]3/8[cF,-]2/8[FF,]/8 [GE,-]/8[AE,]/8| [BG,]3/8[cE,-]/16[BE,-]/16 [A-E,]2/8 [AD,]2/8|",
+	bpm: "120",
+	metre: [4,4],
+	clef: "treble"
+    },
+    tetris: {
+	melody: "[K:C] [e'-e-E,,E,,,]/8[e'eB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'dE,,E,,,]/8[e'B,-G,-E,-]/16[d'B,G,E,]/16 [c'cE,,E,,,]/8[bBB,G,E,]/8| [a-A-A,,A,,,]/8[aACA,E,]/8 [aAA,,A,,,]/8[c'cA,E,C,]/8 [e'-e-A,,A,,,]/8[e'eCA,E,]/8 [d'dA,,A,,,]/8[c'cECA,]/8| [b-B-^G,,G,,,]/8[bBB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'-d-G,,G,,,]/8[d'dEB,G,E,]/8 [e'-e-E,,E,,,]/8[e'eEB,G,E,]/8| [c'cA,,A,,,]/8[cAECA,E,C,]/8 [aAA,,,A,,,,]/8[ecAECA,E,]/8 [aAA,,A,,,]/8[aecAECA,]/8 [aA,]/16[bB,]/16[c'C]/16[d'D]/16| [e'eEE,]/8[d'-d-A,,F,,D,,]/8 [d'dFD,]/8[f'fA,,F,,D,,]/8 [a'-a-AA,]/8[a'aA,,F,,D,,]/8 [g'gA,A,,]/8[f'fF,F,,]/8| [e'-e-C,C,,]/8[e'-e-CC,]/8 [e'eC,C,,]/8[c'cCC,]/8 [e'-e-C,C,,]/8[e'eCA,E,]/8 [d'dG,,G,,,]/8[c'cCA,E,]/8| [b-B-B,,B,,,]/8[bBB,B,,]/8 [bBB,,B,,,]/8[c'cB,B,,]/8 [d'-d-DD,]/8[d'dE,E,,]/8 [e'-e-B,^G,E,]/8[e'eG,G,,]/8| [c'-c-A,,A,,,]/8[c'cA,E,C,]/8 [a-A-A,,A,,,]/8[aACA,E,]/8 [a-A-A,,A,,,]/8[aAECA,]/8 z/4|",
+	bpm: "160",
+	metre: [4,4],
+	clef: "treble"
+    },
+    sweet_home_alabama: {
+	melody: "[K:G] D,/8D,/8 [D-D,-]/16[D-A,-D,]/16[D-A,-]/16[DA,D,]/16 C,/16z/16C,/8- [D-G,-C,]3/16[D-G,-D,]/16| [D-G,-G,,]/16[DG,]/16G,,/8- [D-G,-G,,]3/16[D-G,-]/16 [D-G,-A,,]/16[DG,-^A,,]/16[G,B,,-]/16[D,B,,]/16 E,/16D,/16A,,/16B,,/16| D,/8D,/8 [D-D,-]/16[D-A,-D,]/16[D-A,-]/16[DA,D,]/16 C,/16z/16C,/8- [D-G,-C,]3/16[D-G,-D,]/16| [DG,G,,]/16z/16G,,/8- [DG,G,,-]3/16G,,/16 B,,/16-[B,,G,,]/16G,,/16C,/16- [C,G,,]/16G,,/16^C,/16G,,/16|",
+	bpm: "95",
+	metre: [4,4],
+	clef: "treble"
+    }
+};
+
+const available_song = Object.keys(songs);
+const selection_song = document.getElementById('songinput');
+available_song.map( (element, i) => {
+    let opt = document.createElement("option");
+    opt.value = element;
+    opt.innerHTML = element;
+    selection_song.append(opt);
+});
+selection_song.addEventListener("change", function() {
+    if (this.value == "freestyle") {
+	bpm_input.disabled = false;
+	metrenum_input.disabled = false;
+	metreden_input.disabled = false;
+    } else {
+	bpm_input.value = songs[this.value].bpm;
+	timeline.bpm = bpm_input.value;
+	bpm_input.disabled = true;
+
+	timeline.timeSignature[0] = songs[this.value].metre[0];
+	timeline.timeSignature[1] = songs[this.value].metre[1];
+	metrenum_input.value = timeline.timeSignature[0].toString();
+	metreden_input.value = timeline.timeSignature[1].toString();
+	metrenum_input.disabled = true;
+	metreden_input.disabled = true;
+    }
+
+    render();
+});
+
 
 /**
  * Creates the note selector by adding the notes and rests
@@ -396,6 +550,7 @@ let timeline = {
     },
 
     timeSignature: [4, 4],
+    bpm: 80,
 };
 
 
@@ -439,8 +594,8 @@ function registerTimelineNote(pos = null){
      * @param {Object} noteData As MUSIC_NOTES and boolean if it's dotted
      */
     function createTimelineNote(noteData){
-        console.log('creating note');
-        console.log(noteData);
+        // console.log('creating note');
+        // console.log(noteData);
 
         // Creating graphics
         let note = document.createElement("div");

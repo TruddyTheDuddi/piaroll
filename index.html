@@ -6,6 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/dist/abcjs-basic-min.min.js"></script>
     <script src="js/data.js" defer></script>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/abcjs-audio.min.css">
     <title>Piaroll</title>
 </head>
 <body>
@@ -37,10 +38,32 @@
             <div class="item-adder" id="symbolAdder"></div>
         </div>
 
+	<div class="tempo" id="tempo">
+	  <!-- TODO we should do a conversion from the value to the name (e.g., andante) -->
+          BPM: <input id="bpminput" type="number" value="80"></input><br>
+	  Metre: <input id="metrenuminput" type="number" value="4" min="1"></input>/<input id="metredeninput" type="number" value="4" min="1"></input>
+	  <!-- Add as well a dropdown for the time signature (4/4 vs 3/4 etc.) -->
+        </div>
+
+
         <h3>Result</h3>
         <div id="render">
+	    Song: 
+            <select id="songinput"></select>
+
             <div id="renderoutput"></div>
         </div>
+
+	<h3>Player</h3>
+        <div id="instrument">
+	    Instrument: 
+            <select id="instrumentinput"></select>
+        </div>
+
+        <div id="audio">
+            <div id="audiooutput"></div>
+        </div>
+
     </div>
 
     <div>
