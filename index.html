@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/dist/abcjs-basic-min.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/dist/abcjs-basic.js"></script>
     <script src="js/data.js" defer></script>
+    <script src="html2canvas.js" defer></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/abcjs@6.2.2/abcjs-audio.min.css">
     <title>Piaroll</title>
@@ -64,6 +65,10 @@
             <div id="audiooutput"></div>
         </div>
 
+	<div id="download">
+            <input type="submit" value="Download wav" id="downloadbutton">
+        </div>
+
     </div>
 
     <div>
@@ -97,3 +102,10 @@
 
 </body>
 </html>
+
+<!-- To download
+
+  html2canvas(document.querySelector("#renderoutput")).then(canvas => {
+    document.body.appendChild(canvas)
+    });
+  -->

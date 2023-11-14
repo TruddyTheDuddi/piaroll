@@ -150,7 +150,7 @@ function render() {
     var old_render = document.getElementById("renderoutput");
     old_render.innerHTML = "";
     var cursorControl = {}
-    var synthControl = new ABCJS.synth.SynthController();
+    synthControl = new ABCJS.synth.SynthController();
     // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
     synthControl.load("#audiooutput",
 		      cursorControl,
@@ -178,7 +178,7 @@ function render() {
     const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody]  " + songs[selection_song.value].melody  +"|]";
     var to_render = static_part + other_voice + noteString;
     var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
-    var createSynth = new ABCJS.synth.CreateSynth();
+    createSynth = new ABCJS.synth.CreateSynth();
     createSynth.init({
 	visualObj: visualObj[0],
 	options: {
@@ -314,6 +314,15 @@ let rests = [
 
 // Create the note selector
 createNoteSelector();
+
+let createSynth = { }
+let synthControl = { }
+
+const downloadbutton = document.getElementById("downloadbutton");
+downloadbutton.addEventListener("click", () => {
+    synthControl.download("file.wav");
+});
+
 
 // Dotted symbol (WIP, add updating to designs)
 const dotter = document.getElementById("dotter"); //checkbox
@@ -506,7 +515,6 @@ function createNoteSelector(){
         return box;
     }
 }
-
 
 // Timeline object contains the operations on the timeline and keeps track of the notes added
 let timeline = {
