@@ -139,6 +139,10 @@ input[type="number"]{
     justify-content: space-between;
 }
 
+.editor #displayName{
+    text-transform: capitalize;
+}
+
 .selector .select-box{
     display: grid;
     padding: 0.5em;

@@ -229,70 +229,70 @@ const LENGTHS_BY_DEN = {1: LENGTHS.whole, 2: LENGTHS.half, 4: LENGTHS.quarter, 8
 // Define the existing notes
 const MUSIC_NOTES = {
     whole : {
-        name: "whole",
+        name: "Whole note",
         technicalName: "semibreve",
         duration: LENGTHS.whole,
         type: NOTE_TYPE.NOTE,
         img: "whole.svg",
     },
     half : {
-        name: "half",
+        name: "Half note",
         technicalName: "minim",
         duration: LENGTHS.half,
         type: NOTE_TYPE.NOTE,
         img: "half.svg",
     },
     quarter : {
-        name: "quarter",
+        name: "Quarter note",
         technicalName: "crotchet",
         duration: LENGTHS.quarter,
         type: NOTE_TYPE.NOTE,
         img: "quarter.svg",
     },
     eighth : {
-        name: "eighth",
+        name: "Eighth note",
         technicalName: "quaver",
         duration: LENGTHS.eighth,
         type: NOTE_TYPE.NOTE,
         img: "eighth.svg",
     },
     sixteenth : {
-        name: "sixteenth",
+        name: "Sixteenth note",
         technicalName: "semiquaver",
         duration: LENGTHS.sixteenth,
         type: NOTE_TYPE.NOTE,
         img: "sixteenth.svg",
     },
     restWhole : {
-        name: "restWhole",
+        name: "Whole Rest",
         technicalName: "restWhole",
         duration: LENGTHS.whole,
         type: NOTE_TYPE.REST,
         img: "whole.svg",
     },
     restHalf : {
-        name: "restHalf",
+        name: "Half Rest",
         technicalName: "restHalf",
         duration: LENGTHS.half,
         type: NOTE_TYPE.REST,
         img: "half.svg",
     },
     restQuarter : {
-        name: "restQuarter",
+        name: "Quarter Rest",
         technicalName: "restQuarter",
         duration: LENGTHS.quarter,
         type: NOTE_TYPE.REST,
         img: "quarter.svg"
     },
     restEighth : {
-        name: "restEighth",
+        name: "Eighth Rest",
         technicalName: "restEighth",
         duration: LENGTHS.eighth,
         type: NOTE_TYPE.REST,
         img: "eighth.svg"
     },
     restSixteenth : {
-        name: "restSixteenth",
+        name: "Sixteenth Rest",
         technicalName: "restSixteenth",
         duration: LENGTHS.sixteenth,
         type: NOTE_TYPE.REST,
@@ -461,6 +461,9 @@ function createNoteSelector(){
             let len = timeline.getCurrentSymbolLength();
             timing.innerHTML = len[0] + "/" + len[1];
 
+            // Change display name
+            document.getElementById("displayName").innerHTML = (timeline.currentNote.dotted ? "Dotted " : "") + note.name;
+
             // If note doesn't have dotted, disable the dotter checkbox when selected
             if(!note.duration.dotted){
                 dotter.checked = false;
@@ -487,7 +490,7 @@ function createNoteSelector(){
         });
         
         // By default select the quarter
-        if(note.name == "quarter"){
+        if(note == MUSIC_NOTES.quarter && note.type == "note"){
             radio.checked = true;
             box.classList.add("selected");
             prevNote = box;
@@ -700,6 +703,8 @@ dotter.addEventListener("click", () => {
     let len = timeline.getCurrentSymbolLength();
     timing.innerHTML = len[0] + "/" + len[1];
 
+    // Set symbol title
+    document.getElementById("displayName").innerHTML = (timeline.currentNote.dotted ? "Dotted " : "") + timeline.currentNote.note.name;
 });
 
 // BPM and metre
