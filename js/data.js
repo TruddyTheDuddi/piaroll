@@ -736,6 +736,24 @@ metreden_input.addEventListener("change", () => {
     render();
 });
 
+// Close initial modal
+const closeModalBtn = document.getElementById("closeModal");
+const modal = document.getElementById("modal");
+let clickable = [closeModalBtn, modal];
+clickable.forEach(element => {
+    element.addEventListener("click", (e) => {
+        // Making sure that if you click on the box it doesn't close, but other stuff does it
+        if(!clickable.includes(e.target)) return;
+        document.getElementById("modal").classList.add("hide");
+    });
+});
+
+// Reopen the modal on logo click
+const logoOpener = document.getElementById("logo");
+logoOpener.addEventListener("click", () => {
+    document.getElementById("modal").classList.remove("hide");
+});
+
 
 // Create the note selector
 createNoteSelector();

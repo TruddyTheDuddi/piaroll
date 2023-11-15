@@ -10,10 +10,19 @@
     <title>Piaroll</title>
 </head>
 <body>
-    <div class="info">
-        <h1>Rhythm editor</h1>
-        <p>Click to select symbols, then click on the timeline to add them. Click on a symbol in the timeline to remove it.</p>
-        <p>When you are done, you can click <b>render</b> to show what the transcribed standard notation would look like. You can also <b>play</b> your rhythmic pattern to hear if it matches the song.</p>
+    <div class="modal" id="modal">
+        <div class="info">
+            <img src="img/logo.svg" alt="logo" class="logo">
+            <div class="left">
+                <div>
+                    <h1>Beatz-roll</h1>
+                    <p>Welcome our <b>rhythm editor!</b></p>
+                    <p>We allow you to easily to compose rythms and let you visualize their traditional notation equivalent. Simply <b>select symbols</b> and <b>place them</b> by clicking on the staff.</p>
+                    <p>Select a song preset to experiment with your beats making and rythm recognition skills!</p>
+                </div>
+                <button id="closeModal">Ok</button>
+            </div>
+        </div>
     </div>
 
     <div class="editor" id="editor">
@@ -123,34 +132,19 @@
 
     </div>
 
-    <div>
-        <h3>Random notes for later to discuss</h3>
+    <footer>
+        <img src="img/logo.svg" alt="logo" class="logo" id="logo">
+        <h3>Beatz-roll</h3>
         <div>
-            <ul>
-                <li>
-                    Add BPM meter at the beginning of timeline
-                </li>
-                <li>
-                    BPM changes according to the selected song automatically
-                </li>
-                <li>
-                    Perhaps just 1 tab visible (notes and rests are in different tabs), you can switch between them
-                </li>
-                <li>
-                    Use a checkbox design to set dotted vs non-dotted notes, to keep it simple to understand
-                </li>
-                <li>
-                    What if rhythm plays on hover on the note? With respect to the BPM
-                </li>
-                <li>
-                    Note names on hover like popup tooltips?
-                </li>
-                <li>
-                    On play, the played note is highlighted on the timeline
-                </li>
-            </ul>
+            <span>Created as part of our Project for CS-411 at EPFL</span>
+            <br>
+            <small>2023 Fall</small>
         </div>
-    </div>
+        <!-- <div class="links">
+            <a href="https://github.com/TruddyTheDuddi/piaroll/tree/main">Github</a>
+            <a href="https://www.abcjs.net/">abcJS</a>
+        </div> -->
+    </footer>
 
 </body>
 </html>
