@@ -151,14 +151,46 @@ function draw_bars(elements) {
     }).join("");
 }
 
+const piaSynthParams = {
+    soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
+};
+
+function combineSequences(seq1, seq2) {
+    return {
+        totalDuration: Math.max(seq1.totalDuration, seq2.totalDuration),
+        tracks: [...seq1.tracks, ...seq2.tracks],
+    };
+}
+
 function render() {
-    var old_render = document.getElementById("renderoutput");
-    old_render.innerHTML = "";
-    var cursorControl = {}
+    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
+    const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
+    var selection_instrument = document.getElementById('instrumentinput').value;
+
+    const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
+    const generic_static_part = "X:1\nQ:" + timeline.bpm + "\nL:1/1\nM:" + timeString+"\nK:perc\n"
+    const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument + "] " + draw_bars(notes)  + "|]";
+
+    const visualObj = window.ABCJS.renderAbc("renderoutput", generic_static_part + voice_perc + noteString);
+    var sequence = visualObj[0].setUpAudio(piaSynthParams);
+
+    var selection_song = document.getElementById('songinput').value;
+    if (selection_song != "freestyle") {
+        const voice_melody = "V:melody clef=" + songs[selection_song].clef + "\n";
+        const other_voice = "[V:melody] " + songs[selection_song].melody  +"|]";
+
+        const melodyVisualObj = ABCJS.renderAbc("*", generic_static_part + voice_melody + other_voice);
+        const melodySequence = melodyVisualObj[0].setUpAudio(piaSynthParams);
+        sequence = combineSequences(sequence, melodySequence);
+    }
+
+
+    // SYNTH
+/*
     var synthControl = new ABCJS.synth.SynthController();
     // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
     synthControl.load("#audiooutput",
-		      cursorControl,
+		      {},
 		      {
 			  displayLoop: true,
 			  displayRestart: true,
@@ -167,38 +199,68 @@ function render() {
 			  // displayWarp: true
 		      }
 		     );
-    var audioParams = { chordsOff: true };
-    
-    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
+    var audioParams = { chordsOff: true };*/
 
-    const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
-
-    var selection_instrument = document.getElementById('instrumentinput');
-    var selection_song = document.getElementById('songinput');
-    const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
-    const voice_melody = selection_song.value == "freestyle" ? "" : "V:melody clef=" + songs[selection_song.value].clef + "\n";
-    const score = "%%score (perc) (melody)\n";
-    const static_part = "X:1\nQ:"+ timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\n" + score + voice_perc + voice_melody;
-    const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument.value + "] " + draw_bars(notes)  + "|]";
-    const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody]  " + songs[selection_song.value].melody  +"|]";
-    var to_render = static_part + other_voice + noteString;
-    var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
     var createSynth = new ABCJS.synth.CreateSynth();
     createSynth.init({
-	visualObj: visualObj[0],
-	options: {
-	    soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
-	}
+	    sequence,
+	    options: piaSynthParams,
     }).then(function () {
-	synthControl.setTune(visualObj[0], false, audioParams).then(function () {
+        // TODO that's the problem
+	    return synthControl.setTune(visualObj[0], false, audioParams);
+    }).then(function () {
 	    console.log("Audio successfully loaded.")
 	}).catch(function (error) {
 	    console.warn("Audio problem:", error);
 	});
-    }).catch(function (error) {
-	console.warn("Audio problem:", error);
-    });
 }
+
+const playbackManager = {
+    synth: undefined,
+    state: "empty",
+    toggle: function() {
+        if (this.state === "initializing") {
+            this.state = () => this.toggle();
+        } else if (this.state === "initialized") {
+            this.synth.prime().then(() => {
+                if (this.state === "initialized") {
+                    this.synth.start();
+                    this.state = "running";
+                }
+            });
+        } else if (this.state === "running") {
+            this.synth.pause();
+            this.state = "paused";
+        } else if (this.state === "paused") {
+            this.synth.resume();
+            this.state = "running";
+        } else if (this.state === "stopped") {
+            this.synth.start();
+            this.state = "running";
+        } else if (this.state === "empty") {
+            
+        }
+    },
+    stop: function() {},
+    setSequence: function(sequence) {
+        this.stop();
+        if (this.synth) {
+            this.state = "initializing";
+            this.synth.init({
+                sequence,
+                options: piaSynthParams,
+            }).then(() => {
+                this.state = "initialized";
+                if (typeof this.state === "function") {
+                    this.state();
+                }
+            })
+            .catch(function (error) {
+                console.warn("Audio problem:", error);
+            });
+        }
+    },
+};
 
 const LENGTHS = {
     whole: noteLength({

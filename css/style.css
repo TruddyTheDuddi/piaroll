@@ -252,7 +252,7 @@ input[type="number"]{
 .tool-panel .inputline>*:last-child{
     margin-left: auto;
 }
-
+/*
 .tool-panel .audio-settings{
     display: grid;
     gap: 0.5em;
@@ -305,6 +305,20 @@ input[type="number"]{
 
 #audio .abcjs-inline-audio button.abcjs-pushed{
     filter: invert(47%) sepia(49%) saturate(6049%) hue-rotate(207deg) brightness(98%) contrast(100%);
+}
+*/
+
+#audio {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+}
+
+#audio > button {
+    display: block;
+    width: 4em;
+    height: 4em;
 }
 
 .tool-panel .verti-sepa{
