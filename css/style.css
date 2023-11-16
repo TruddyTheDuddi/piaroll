@@ -252,61 +252,12 @@ input[type="number"]{
 .tool-panel .inputline>*:last-child{
     margin-left: auto;
 }
-/*
+
 .tool-panel .audio-settings{
     display: grid;
     gap: 0.5em;
     flex: 1;
 }
-
-.tool-panel #audio{
-    display: grid;
-    gap: 0em;
-    align-self: center;
-}
-
-#audio .abcjs-inline-audio{
-    margin: 0;
-    height: auto;
-    padding: 0;
-    gap: 1em;
-    background-color: transparent;
-    flex-direction: row-reverse;
-}
-
-#audio .abcjs-midi-clock{
-    display: none;
-    visibility: hidden;
-}
-
-#audio .abcjs-inline-audio button{
-    height: 2em;
-    width: 1.8em;
-    cursor: pointer;
-    line-height: initial;
-    margin-right: 0;
-    opacity: 0.8;
-    padding: 0;
-    border: transparent;
-    transition: 0.15s opacity;
-    filter: invert(0.9);
-}
-
-#audio .abcjs-inline-audio button.abcjs-midi-start{
-    height: 3em;
-    width: 2.5em;
-    opacity: 1;
-}
-
-#audio .abcjs-inline-audio button:hover{
-    opacity: 0.4;
-    transition: 0s opacity;
-}
-
-#audio .abcjs-inline-audio button.abcjs-pushed{
-    filter: invert(47%) sepia(49%) saturate(6049%) hue-rotate(207deg) brightness(98%) contrast(100%);
-}
-*/
 
 #audio {
     display: flex;
@@ -315,10 +266,30 @@ input[type="number"]{
     gap: 0.5em;
 }
 
-#audio > button {
+#audio > span {
     display: block;
-    width: 4em;
-    height: 4em;
+    width: 2em;
+    height: 2em;
+    cursor: pointer;
+    background-color: transparent;
+    background-size: cover;
+}
+
+#audio > span:hover {
+    opacity: 0.6;
+    transition: 0s opacity;
+}
+
+#audioplay {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><polygon fill='none' stroke='black' stroke-width='3.5' points='2,2 2,34 30,18'/></svg>");
+}
+
+#audioplay.audiorunning {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><line x1='10' y1='2' x2='10' y2='34' stroke='black' stroke-width='8' /><line x1='26' y1='2' x2='26' y2='34' stroke='black' stroke-width='8' /></svg>");
+}
+
+#audiostop {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect x='2' y='2' width='32' height='32' fill='black'/></svg>");
 }
 
 .tool-panel .verti-sepa{

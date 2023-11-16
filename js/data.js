@@ -194,6 +194,13 @@ const playbackManager = {
     sequence: undefined, // if set means init has to be run again -> synth not ready
     state: "stopped",    // running | paused | stopped
     _setState: function(state) {
+        let classes = playButton.classList;
+        if (this.state === "running") {
+            classes.remove("audiorunning");
+        }
+        if (state === "running") {
+            classes.add("audiorunning");
+        }
         this.state = state;
     },
     toggle: function() {
