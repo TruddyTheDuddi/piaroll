@@ -153,11 +153,13 @@ function draw_bars(elements) {
 
 const piaSynthParams = {
     soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
+    onEnded: () => playbackManager.onEnded(),
 };
 
+/** Combine the tracks of two sequences and use the length of the first */
 function combineSequences(seq1, seq2) {
     return {
-        totalDuration: Math.max(seq1.totalDuration, seq2.totalDuration),
+        totalDuration: seq1.totalDuration,
         tracks: [...seq1.tracks, ...seq2.tracks],
     };
 }
@@ -181,86 +183,81 @@ function render() {
 
         const melodyVisualObj = ABCJS.renderAbc("*", generic_static_part + voice_melody + other_voice);
         const melodySequence = melodyVisualObj[0].setUpAudio(piaSynthParams);
-        sequence = combineSequences(sequence, melodySequence);
+        sequence = combineSequences(melodySequence, sequence);
     }
 
-
-    // SYNTH
-/*
-    var synthControl = new ABCJS.synth.SynthController();
-    // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
-    synthControl.load("#audiooutput",
-		      {},
-		      {
-			  displayLoop: true,
-			  displayRestart: true,
-			  displayPlay: true,
-			  displayProgress: false,
-			  // displayWarp: true
-		      }
-		     );
-    var audioParams = { chordsOff: true };*/
-
-    var createSynth = new ABCJS.synth.CreateSynth();
-    createSynth.init({
-	    sequence,
-	    options: piaSynthParams,
-    }).then(function () {
-        // TODO that's the problem
-	    return synthControl.setTune(visualObj[0], false, audioParams);
-    }).then(function () {
-	    console.log("Audio successfully loaded.")
-	}).catch(function (error) {
-	    console.warn("Audio problem:", error);
-	});
+    playbackManager.setSequence(sequence);
 }
 
 const playbackManager = {
-    synth: undefined,
-    state: "empty",
+    synth: undefined,    // created on first run ;       if empty -> synth not ready
+    sequence: undefined, // if set means init has to be run again -> synth not ready
+    state: "stopped",    // running | paused | stopped
+    _setState: function(state) {
+        this.state = state;
+    },
     toggle: function() {
-        if (this.state === "initializing") {
-            this.state = () => this.toggle();
-        } else if (this.state === "initialized") {
-            this.synth.prime().then(() => {
-                if (this.state === "initialized") {
-                    this.synth.start();
-                    this.state = "running";
+        if (this.state === "stopped") {
+            this._setState("running");
+            if (this.sequence) { // not initialized yet
+                if (!this.synth) {
+                    this.synth = new ABCJS.synth.CreateSynth();
                 }
-            });
-        } else if (this.state === "running") {
-            this.synth.pause();
-            this.state = "paused";
+
+                this.synth.init({
+                    sequence: this.sequence,
+                    options: piaSynthParams,
+                }).then(() => this.synth.prime())
+                .then(() => {
+                    if (this.state === "running") {
+                        this.sequence = undefined;
+                        this.synth.start();
+                    }
+                })
+                .catch(function (error) {
+                    console.warn("Audio problem:", error);
+                });
+            } else if (this.synth) {
+                this.synth.start();
+            }
         } else if (this.state === "paused") {
+            // synthState is always ready when paused
             this.synth.resume();
-            this.state = "running";
-        } else if (this.state === "stopped") {
-            this.synth.start();
-            this.state = "running";
-        } else if (this.state === "empty") {
-            
+            this._setState("running");
+        } else if (this.state === "running" && !this.sequence) {
+            this.synth.pause();
+            this._setState("paused");
+        } // if synthState is 'empty' and state is running, user is waiting for play
+    },
+    stop: function() {
+        if (this.state !== "stopped") {
+            if (this.synth && !this.sequence) {
+                this.synth.stop();
+            }
+            this._setState("stopped");
         }
     },
-    stop: function() {},
+    onEnded: function() {
+        if (this.state === "running") {
+            // replace this line with `this.stop()` to not repeat
+            this.synth.start();
+        } // when paused, the handler was called b/c of pause, should not reset
+    },
     setSequence: function(sequence) {
         this.stop();
-        if (this.synth) {
-            this.state = "initializing";
-            this.synth.init({
-                sequence,
-                options: piaSynthParams,
-            }).then(() => {
-                this.state = "initialized";
-                if (typeof this.state === "function") {
-                    this.state();
-                }
-            })
-            .catch(function (error) {
-                console.warn("Audio problem:", error);
-            });
-        }
+        this.sequence = sequence;
     },
 };
+
+const playButton = document.getElementById("audioplay");
+playButton.addEventListener("click", () => {
+    playbackManager.toggle();
+});
+
+const stopButton = document.getElementById("audiostop");
+stopButton.addEventListener("click", () => {
+    playbackManager.stop();
+});
 
 const LENGTHS = {
     whole: noteLength({
