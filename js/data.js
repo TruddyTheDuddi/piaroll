@@ -142,10 +142,11 @@ function draw_bars(elements) {
         if (element == null) {
             return "|";
         } else {
-            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
+            const isNote = element.source.noteType == NOTE_TYPE.NOTE;
+            const note = isNote ? "B" : "z";
             const [num, den] = element.length.length;
 
-            const appendix = element.hasNext ? "-" : "";
+            const appendix = isNote ? (element.hasNext ? "-" : "") : " ";
             return note + num + "/" + den + appendix;
         }
     }).join("");
