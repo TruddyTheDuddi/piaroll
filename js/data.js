@@ -181,7 +181,7 @@ function render() {
     const generic_static_part = "X:1\nQ:" + timeline.bpm + "\nL:1/1\nM:" + timeString+"\nK:perc\n"
     const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument + "] " + draw_bars(notes)  + "|]";
 
-    const visualObj = window.ABCJS.renderAbc("renderoutput", generic_static_part + voice_perc + noteString);
+    const visualObj = ABCJS.renderAbc("renderoutput", generic_static_part + voice_perc + noteString, {selectTypes: false});
     var visualTune = visualObj[0];
 
     var selection_song = document.getElementById('songinput').value;
