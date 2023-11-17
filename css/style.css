@@ -280,6 +280,11 @@ input[type="number"]{
     transition: 0s opacity;
 }
 
+#audio > span.audiodisabled {
+    opacity: 0.4 !important;
+    cursor: default !important;
+}
+
 #audioplay {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><polygon fill='none' stroke='black' stroke-width='3.5' points='2,2 2,34 30,18'/></svg>");
 }

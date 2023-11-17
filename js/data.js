@@ -156,11 +156,18 @@ const piaSynthParams = {
     onEnded: () => playbackManager.onEnded(),
 };
 
-/** Combine the tracks of two sequences and use the length of the first */
-function combineSequences(seq1, seq2) {
+/** Combine two tunes which supports setting up a merged audio with the sequences of both tunes and the length of the first */
+function combineVisualTunes(tune1, tune2) {
     return {
-        totalDuration: seq1.totalDuration,
-        tracks: [...seq1.tracks, ...seq2.tracks],
+        ...tune1,
+        setUpAudio: function(params) {
+            const seq1 = tune1.setUpAudio(params);
+            const seq2 = tune2.setUpAudio(params);
+            return {
+                totalDuration: seq1.totalDuration,
+                tracks: [...seq1.tracks, ...seq2.tracks],
+            };
+        },
     };
 }
 
@@ -174,7 +181,7 @@ function render() {
     const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument + "] " + draw_bars(notes)  + "|]";
 
     const visualObj = window.ABCJS.renderAbc("renderoutput", generic_static_part + voice_perc + noteString);
-    var sequence = visualObj[0].setUpAudio(piaSynthParams);
+    var visualTune = visualObj[0];
 
     var selection_song = document.getElementById('songinput').value;
     if (selection_song != "freestyle") {
@@ -182,17 +189,18 @@ function render() {
         const other_voice = "[V:melody] " + songs[selection_song].melody  +"|]";
 
         const melodyVisualObj = ABCJS.renderAbc("*", generic_static_part + voice_melody + other_voice);
-        const melodySequence = melodyVisualObj[0].setUpAudio(piaSynthParams);
-        sequence = combineSequences(melodySequence, sequence);
+        visualTune = combineVisualTunes(melodyVisualObj[0], visualTune);
+    } else if (timeline.editor.length == 0) {
+        visualTune = undefined;
     }
 
-    playbackManager.setSequence(sequence);
+    playbackManager.setVisualTune(visualTune);
 }
 
 const playbackManager = {
-    synth: undefined,    // created on first run ;       if empty -> synth not ready
-    sequence: undefined, // if set means init has to be run again -> synth not ready
-    state: "stopped",    // running | paused | stopped
+    synth: undefined,      // created on first run ;       if empty -> synth not ready
+    visualTune: undefined, // if set means init has to be run again -> synth not ready
+    state: "stopped",      // running | paused | stopped | disabled
     _setState: function(state) {
         let classes = playButton.classList;
         if (this.state === "running") {
@@ -206,18 +214,18 @@ const playbackManager = {
     toggle: function() {
         if (this.state === "stopped") {
             this._setState("running");
-            if (this.sequence) { // not initialized yet
+            if (this.visualTune) { // not initialized yet
                 if (!this.synth) {
                     this.synth = new ABCJS.synth.CreateSynth();
                 }
 
                 this.synth.init({
-                    sequence: this.sequence,
+                    visualObj: this.visualTune,
                     options: piaSynthParams,
                 }).then(() => this.synth.prime())
                 .then(() => {
                     if (this.state === "running") {
-                        this.sequence = undefined;
+                        this.visualTune = undefined;
                         this.synth.start();
                     }
                 })
@@ -231,14 +239,14 @@ const playbackManager = {
             // synthState is always ready when paused
             this.synth.resume();
             this._setState("running");
-        } else if (this.state === "running" && !this.sequence) {
+        } else if (this.state === "running" && !this.visualTune) {
             this.synth.pause();
             this._setState("paused");
         } // if synthState is 'empty' and state is running, user is waiting for play
     },
     stop: function() {
-        if (this.state !== "stopped") {
-            if (this.synth && !this.sequence) {
+        if (this.state === "running" || this.state === "paused") {
+            if (this.synth && !this.visualTune) {
                 this.synth.stop();
             }
             this._setState("stopped");
@@ -250,9 +258,19 @@ const playbackManager = {
             this.synth.start();
         } // when paused, the handler was called b/c of pause, should not reset
     },
-    setSequence: function(sequence) {
+    setVisualTune: function(visualTune) {
         this.stop();
-        this.sequence = sequence;
+
+        if (visualTune) {
+            this.state = "stopped";
+            this.visualTune = visualTune;
+            playButton.classList.remove("audiodisabled");
+            stopButton.classList.remove("audiodisabled");
+        } else {
+            this.state = "disabled"; // no _setState because was in stopped state before
+            playButton.classList.add("audiodisabled");
+            stopButton.classList.add("audiodisabled");
+        }
     },
 };
 
