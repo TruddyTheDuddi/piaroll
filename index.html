@@ -10,90 +10,141 @@
     <title>Piaroll</title>
 </head>
 <body>
-    <div class="info">
-        <h1>Rhythm editor</h1>
-        <p>Click to select symbols, then click on the timeline to add them. Click on a symbol in the timeline to remove it.</p>
-        <p>When you are done, you can click <b>render</b> to show what the transcribed standard notation would look like. You can also <b>play</b> your rhythmic pattern to hear if it matches the song.</p>
+    <div class="modal" id="modal">
+        <div class="info">
+            <img src="img/logo.svg" alt="logo" class="logo">
+            <div class="left">
+                <div>
+                    <h1>Beatz-roll</h1>
+                    <p>Welcome to our <b>rhythm editor!</b></p>
+                    <p>We allow you to easily compose rythms and let you visualize their traditional notation equivalent. Simply <b>select symbols</b> and <b>place them</b> by clicking on the staff.</p>
+                    <p>Select a song preset to experiment with your beats making and rythm recognition skills!</p>
+                </div>
+                <button id="closeModal">Ok</button>
+            </div>
+        </div>
     </div>
 
     <div class="editor" id="editor">
-        <div class="selector-holder">
-            <div>
-                <h3>Notes</h3>
-                <div id="notes" class="selector"></div>
+        <div class="toolbox">
+            <div class="tool-panel symbols">
+
+                <div class="tabs interact">
+                    <div id="notesTab" class="selected">Notes</div>
+                    <div id="restsTab">Rests</div>
+                </div>
+
+                <div class="content">
+                    <div id="notes" class="selector"></div>
+                    <div id="rests" class="selector hidden"></div>
+                    <div class="note-info">
+                        <div>
+                            <h3 id="displayName">Quarter Note</h3>
+                            <span class="timing-holder">
+                                <span>Length value</span>
+                                <span class="timing" id="timing">1/4</span>
+                            </span>
+                        </div>
+                        <div style="display: grid;">
+                            <label class="dotter">
+                                <input type="checkbox" name="dotted" id="dotter" autocomplete="off"> Dotted
+                                <div><span></span></div>
+                            </label>
+                            <!-- <small style="text-align: right;">Length x1.5</small> -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div>
-                <h3>Rests</h3>
-                <div id="rests" class="selector"></div>
+
+
+            <div class="tool-panel middle">
+                <div class="content inline">
+
+                    <div id="audio">
+                        <div id="audiooutput"></div>
+                    </div>
+
+                    <div class="verti-sepa"></div>
+
+                    <div class="audio-settings">
+                        <div class="inputline">
+                            <span class="desc">
+                                Song selector
+                                <small>(Locks tempo settings)</small>
+                            </span>
+                            <select id="songinput">
+                            </select>
+                        </div>
+
+                        <div class="inputline">
+                            <span class="desc">
+                                Instrument
+                            </span>
+                            <select id="instrumentinput">
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div>
-                <label>
-                    <input type="checkbox" name="dotted" id="dotter" autocomplete="off"> Dotted (WIP)
-                </label>
+
+            <div class="tool-panel tempo">
+                <div class="tabs right">
+                    <div class="selected">Tempo Settings</div>
+                </div>
+            
+                <div class="content inline">
+                    <div class="inputline">
+                        <span class="desc">
+                            BPM
+                            <small>Beat per Minute</small>
+                        </span>
+                        <input id="bpminput" type="number" value="80"></input>
+                    </div>
+                    <div class="inputline">
+                        <span>
+                            Meter
+                        </span>
+                        <span class="metre">
+                            <input class="top input" id="metrenuminput" type="number" value="4" min="1"></input>
+                            <hr>
+                            <select class="low input" name="metre" id="metredeninput">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="4" selected>4</option>
+                                <option value="8">8</option>
+                                <option value="16">16</option>
+                            </select>
+                        </span>
+                    </div>
+                </div>
             </div>
+
         </div>
 
-        <h3>Timeline</h3>
         <div class="timeline" id="timeline">
             <div class="item-adder" id="symbolAdder"></div>
+            <small class="hint" id="timelineHint">Click here to add a note</small>
         </div>
 
-	<div class="tempo" id="tempo">
-	  <!-- TODO we should do a conversion from the value to the name (e.g., andante) -->
-          BPM: <input id="bpminput" type="number" value="80"></input><br>
-	  Metre: <input id="metrenuminput" type="number" value="4" min="1"></input>/<input id="metredeninput" type="number" value="4" min="1"></input>
-	  <!-- Add as well a dropdown for the time signature (4/4 vs 3/4 etc.) -->
-        </div>
-
-
-        <h3>Result</h3>
-        <div id="render">
-	    Song: 
-            <select id="songinput"></select>
-
-            <div id="renderoutput"></div>
-        </div>
-
-	<h3>Player</h3>
-        <div id="instrument">
-	    Instrument: 
-            <select id="instrumentinput"></select>
-        </div>
-
-        <div id="audio">
-            <div id="audiooutput"></div>
-        </div>
+        <div id="renderoutput"></div>
 
     </div>
 
-    <div>
-        <h3>Random notes for later to discuss</h3>
+    <footer>
+        <img src="img/logo.svg" alt="logo" class="logo" id="logo">
+        <h3>Beatz-roll</h3>
         <div>
-            <ul>
-                <li>
-                    Add BPM meter at the beginning of timeline
-                </li>
-                <li>
-                    BPM changes according to the selected song automatically
-                </li>
-                <li>
-                    Perhaps just 1 tab visible (notes and rests are in different tabs), you can switch between them
-                </li>
-                <li>
-                    Use a checkbox design to set dotted vs non-dotted notes, to keep it simple to understand
-                </li>
-                <li>
-                    What if rhythm plays on hover on the note? With respect to the BPM
-                </li>
-                <li>
-                    Note names on hover like popup tooltips?
-                </li>
-                <li>
-                    On play, the played note is highlighted on the timeline
-                </li>
-            </ul>
+            <span>Created as part of our Project for CS-411 at EPFL</span>
+            <br>
+            <small>2023 Fall</small>
         </div>
-    </div>
+        <!-- <div class="links">
+            <a href="https://github.com/TruddyTheDuddi/piaroll/tree/main">Github</a>
+            <a href="https://www.abcjs.net/">abcJS</a>
+        </div> -->
+    </footer>
 
 </body>
 </html>

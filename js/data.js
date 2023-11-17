@@ -4,6 +4,11 @@ const NOTE_TYPE = {
     REST: "rest"
 }
 
+const NOTE_DESIGN = {
+    ICON: "",
+    TIMELINE: "timeline/"
+}
+
 function normalizeLength([num, den]) {
     while (num % 2 == 0 && den >= 2) {
         num /= 2;
@@ -158,7 +163,7 @@ function render() {
 			  displayLoop: true,
 			  displayRestart: true,
 			  displayPlay: true,
-			  displayProgress: true,
+			  displayProgress: false,
 			  // displayWarp: true
 		      }
 		     );
@@ -224,74 +229,74 @@ const LENGTHS_BY_DEN = {1: LENGTHS.whole, 2: LENGTHS.half, 4: LENGTHS.quarter, 8
 // Define the existing notes
 const MUSIC_NOTES = {
     whole : {
-        name: "whole",
+        name: "Whole note",
         technicalName: "semibreve",
         duration: LENGTHS.whole,
         type: NOTE_TYPE.NOTE,
-        img: "img/note/whole.svg"
+        img: "whole.svg",
     },
     half : {
-        name: "half",
+        name: "Half note",
         technicalName: "minim",
         duration: LENGTHS.half,
         type: NOTE_TYPE.NOTE,
-        img: "img/note/half.svg"
+        img: "half.svg",
     },
     quarter : {
-        name: "quarter",
+        name: "Quarter note",
         technicalName: "crotchet",
         duration: LENGTHS.quarter,
         type: NOTE_TYPE.NOTE,
-        img: "img/note/quarter.svg"
+        img: "quarter.svg",
     },
     eighth : {
-        name: "eighth",
+        name: "Eighth note",
         technicalName: "quaver",
         duration: LENGTHS.eighth,
         type: NOTE_TYPE.NOTE,
-        img: "img/note/eighth.svg"
+        img: "eighth.svg",
     },
     sixteenth : {
-        name: "sixteenth",
+        name: "Sixteenth note",
         technicalName: "semiquaver",
         duration: LENGTHS.sixteenth,
         type: NOTE_TYPE.NOTE,
-        img: "img/note/sixteenth.svg"
+        img: "sixteenth.svg",
     },
     restWhole : {
-        name: "restWhole",
+        name: "Whole Rest",
         technicalName: "restWhole",
         duration: LENGTHS.whole,
         type: NOTE_TYPE.REST,
-        img: "img/rest/whole.svg"
+        img: "whole.svg",
     },
     restHalf : {
-        name: "restHalf",
+        name: "Half Rest",
         technicalName: "restHalf",
         duration: LENGTHS.half,
         type: NOTE_TYPE.REST,
-        img: "img/rest/half.svg"
+        img: "half.svg",
     },
     restQuarter : {
-        name: "restQuarter",
+        name: "Quarter Rest",
         technicalName: "restQuarter",
         duration: LENGTHS.quarter,
         type: NOTE_TYPE.REST,
-        img: "img/rest/quarter.svg"
+        img: "quarter.svg"
     },
     restEighth : {
-        name: "restEighth",
+        name: "Eighth Rest",
         technicalName: "restEighth",
         duration: LENGTHS.eighth,
         type: NOTE_TYPE.REST,
-        img: "img/rest/eighth.svg"
+        img: "eighth.svg"
     },
     restSixteenth : {
-        name: "restSixteenth",
+        name: "Sixteenth Rest",
         technicalName: "restSixteenth",
         duration: LENGTHS.sixteenth,
         type: NOTE_TYPE.REST,
-        img: "img/rest/sixteenth.svg"
+        img: "sixteenth.svg"
     }
 };
 
@@ -311,43 +316,6 @@ let rests = [
     MUSIC_NOTES.restEighth,
     MUSIC_NOTES.restSixteenth
 ]
-
-// Create the note selector
-createNoteSelector();
-
-// Dotted symbol (WIP, add updating to designs)
-const dotter = document.getElementById("dotter"); //checkbox
-dotter.addEventListener("click", () => {
-    timeline.currentNote.dotted = dotter.checked;
-});
-
-var bpm_input = document.getElementById("bpminput");
-bpm_input.addEventListener("change", () => {
-    timeline.bpm = bpm_input.value;
-    render();
-});
-
-var metrenum_input = document.getElementById("metrenuminput");
-metrenum_input.addEventListener("change", () => {
-    if (metrenum_input.value < metrenum_input.min) {
-	const result = document.getElementById('renderoutput')
-	result.innerHTML = "The metre elements should be 1 or greater";
-	return;
-    }
-    timeline.timeSignature[0] = Number(metrenum_input.value);
-    render();
-});
-
-var metreden_input = document.getElementById("metredeninput");
-metreden_input.addEventListener("change", () => {
-    if (metreden_input.value < metreden_input.min) {
-	const result = document.getElementById('renderoutput');
-	result.innerHTML = "The metre elements should be 1 or greater";
-	return;
-    }
-    timeline.timeSignature[1] = Number(metreden_input.value);
-    render();
-});
 
 const instruments = {
     bass_drum_1: "36",
@@ -467,7 +435,7 @@ function createNoteSelector(){
         let noteImg = document.createElement("img");
         
         // Image of the note
-        noteImg.src = note.img;
+        noteImg.src = "img/" + note.type + "/" + NOTE_DESIGN.ICON + note.img;
         noteImg.classList.add("noteImg");
         box.appendChild(noteImg);
 
@@ -487,7 +455,34 @@ function createNoteSelector(){
             }
             box.classList.add("selected");
             prevNote = box;
+
+            // Set the length value
+            let timing = document.getElementById("timing");
+            let len = timeline.getCurrentSymbolLength();
+            timing.innerHTML = len[0] + "/" + len[1];
+
+            // Change display name
+            document.getElementById("displayName").innerHTML = (timeline.currentNote.dotted ? "Dotted " : "") + note.name;
+
+            // If note doesn't have dotted, disable the dotter checkbox when selected
+            if(!note.duration.dotted){
+                dotter.checked = false;
+                dotter.parentElement.classList.add("disabled");
+            } else {
+                dotter.parentElement.classList.remove("disabled");
+            }
         });
+
+        // If not doesn't have dotter, disable when dotter is checked
+        if(!note.duration.dotted){
+            dotter.addEventListener("change", function(){
+                if(dotter.checked){
+                    box.classList.add("disabled");
+                } else {
+                    box.classList.remove("disabled");
+                }
+            });
+        }
 
         // Set the seleted note in timeline
         radio.addEventListener("click", function(){
@@ -495,7 +490,7 @@ function createNoteSelector(){
         });
         
         // By default select the quarter
-        if(note.name == "quarter"){
+        if(note == MUSIC_NOTES.quarter && note.type == "note"){
             radio.checked = true;
             box.classList.add("selected");
             prevNote = box;
@@ -549,8 +544,19 @@ let timeline = {
         dotted: false,
     },
 
+    // Get the current note lenght
+    getCurrentSymbolLength: function(){
+        if(this.currentNote.dotted){
+            return this.currentNote.note.duration.dotted().length;
+        } else {
+            return this.currentNote.note.duration.length;
+        }
+    },
+
     timeSignature: [4, 4],
     bpm: 80,
+
+    timelineHint: true
 };
 
 
@@ -561,6 +567,7 @@ symbolAdder.addEventListener("click", () => {
 });
 
 function registerTimelineNote(pos = null){
+    
     // Create the note graphics
     let noteRaw = createTimelineNote(timeline.currentNote);
 
@@ -589,6 +596,15 @@ function registerTimelineNote(pos = null){
     if(pos == null)
         timeline.el.scrollLeft = timeline.el.scrollWidth;
 
+    // Trigger close hint
+    if(timeline.timelineHint){
+        timeline.timelineHint = false;
+        document.getElementById("timelineHint").classList.add("hide");
+        setTimeout(() => {
+            document.getElementById("timelineHint").remove();
+        }, 5000);
+    }
+
     /**
      * Creates the note for the timeline with all the necessary methods
      * @param {Object} noteData As MUSIC_NOTES and boolean if it's dotted
@@ -606,8 +622,12 @@ function registerTimelineNote(pos = null){
         
         // Setup image
         let imgNote = document.createElement("img");
-        imgNote.src = noteData.note.img;
+        imgNote.src = "img/" + noteData.note.type + "/" + NOTE_DESIGN.TIMELINE + noteData.note.img;
         imgNote.classList.add("item");
+
+        if(noteData.note == MUSIC_NOTES.restWhole || noteData.note == MUSIC_NOTES.restHalf){
+            imgNote.classList.add("noshadow");
+        }
 
         // Action area
         let insertActionArea = document.createElement("div");
@@ -640,3 +660,103 @@ function registerTimelineNote(pos = null){
         }
     }
 }
+
+// Setup symbol toolbox tabs
+const notesTab = document.getElementById("notesTab");
+const restsTab = document.getElementById("restsTab");
+
+notesTab.addEventListener("click", () => {
+    notesTab.classList.add("selected");
+    restsTab.classList.remove("selected");
+
+    document.getElementById("notes").classList.remove("hidden");
+    document.getElementById("rests").classList.add("hidden");
+});
+
+restsTab.addEventListener("click", () => {
+    restsTab.classList.add("selected");
+    notesTab.classList.remove("selected");
+
+    document.getElementById("rests").classList.remove("hidden");
+    document.getElementById("notes").classList.add("hidden");
+});
+
+// Dotted symbol
+const dotter = document.getElementById("dotter"); //checkbox
+dotter.addEventListener("click", () => {
+    timeline.currentNote.dotted = dotter.checked;
+
+    // Update all the notes in the selector
+    let notesBox = document.getElementById("notes");
+    for(let i = 0; i < notesBox.children.length; i++){
+        notesBox.children[i].classList.toggle("dotted");
+    }
+
+    // Same for rests
+    let restsBox = document.getElementById("rests");
+    for(let i = 0; i < restsBox.children.length; i++){
+        restsBox.children[i].classList.toggle("dotted");
+    }
+
+    // Set the new length value
+    let timing = document.getElementById("timing");
+    let len = timeline.getCurrentSymbolLength();
+    timing.innerHTML = len[0] + "/" + len[1];
+
+    // Set symbol title
+    document.getElementById("displayName").innerHTML = (timeline.currentNote.dotted ? "Dotted " : "") + timeline.currentNote.note.name;
+});
+
+// BPM and metre
+const bpm_input = document.getElementById("bpminput");
+bpm_input.addEventListener("change", () => {
+    timeline.bpm = bpm_input.value;
+    render();
+});
+
+const metrenum_input = document.getElementById("metrenuminput");
+metrenum_input.addEventListener("change", () => {
+    if (metrenum_input.value < metrenum_input.min) {
+        const result = document.getElementById('renderoutput')
+        result.innerHTML = "The metre elements should be 1 or greater";
+        return;
+    }
+    timeline.timeSignature[0] = Number(metrenum_input.value);
+    render();
+});
+
+const metreden_input = document.getElementById("metredeninput");
+metreden_input.addEventListener("change", () => {
+    if (metreden_input.value < metreden_input.min) {
+        const result = document.getElementById('renderoutput');
+        result.innerHTML = "The metre elements should be 1 or greater";
+        return;
+    }
+    timeline.timeSignature[1] = Number(metreden_input.value);
+    render();
+});
+
+// Close initial modal
+const closeModalBtn = document.getElementById("closeModal");
+const modal = document.getElementById("modal");
+let clickable = [closeModalBtn, modal];
+clickable.forEach(element => {
+    element.addEventListener("click", (e) => {
+        // Making sure that if you click on the box it doesn't close, but other stuff does it
+        if(!clickable.includes(e.target)) return;
+        document.getElementById("modal").classList.add("hide");
+    });
+});
+
+// Reopen the modal on logo click
+const logoOpener = document.getElementById("logo");
+logoOpener.addEventListener("click", () => {
+    document.getElementById("modal").classList.remove("hide");
+});
+
+
+// Create the note selector
+createNoteSelector();
+
+// Init initially to see player buttons
+render();
