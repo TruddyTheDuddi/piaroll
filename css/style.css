@@ -577,3 +577,7 @@ footer h3{
     color: var(--selected);
     font-weight: normal;
 }
+
+.noteplaying {
+    fill: var(--selected) !important;
+}

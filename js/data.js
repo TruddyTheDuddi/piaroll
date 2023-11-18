@@ -195,12 +195,14 @@ function render() {
         visualTune = undefined;
     }
 
-    playbackManager.setVisualTune(visualTune);
+    playbackManager.setVisualTune(visualTune, visualObj[0]);
 }
 
 const playbackManager = {
     synth: undefined,      // created on first run ;       if empty -> synth not ready
     visualTune: undefined, // if set means init has to be run again -> synth not ready
+    timing: undefined,     // TimingCallbacks created when a visualTune is passed
+    oldElements: [],       // active in timing
     state: "stopped",      // running | paused | stopped | disabled
     _setState: function(state) {
         let classes = playButton.classList;
@@ -228,6 +230,7 @@ const playbackManager = {
                     if (this.state === "running") {
                         this.visualTune = undefined;
                         this.synth.start();
+                        this.timing.start();
                     }
                 })
                 .catch(function (error) {
@@ -235,12 +238,15 @@ const playbackManager = {
                 });
             } else if (this.synth) {
                 this.synth.start();
+                this.timing.start(0); // always start at the beginning
             }
         } else if (this.state === "paused") {
             // synthState is always ready when paused
             this.synth.resume();
+            this.timing.start();
             this._setState("running");
         } else if (this.state === "running" && !this.visualTune) {
+            this.timing.pause();
             this.synth.pause();
             this._setState("paused");
         } // if synthState is 'empty' and state is running, user is waiting for play
@@ -248,7 +254,11 @@ const playbackManager = {
     stop: function() {
         if (this.state === "running" || this.state === "paused") {
             if (this.synth && !this.visualTune) {
+                this.timing.stop(); // does not really reset...
                 this.synth.stop();
+
+                this.oldElements.forEach(note => note.classList.remove("noteplaying"));
+                this.oldElements = [];
             }
             this._setState("stopped");
         }
@@ -256,15 +266,35 @@ const playbackManager = {
     onEnded: function() {
         if (this.state === "running") {
             // replace this line with `this.stop()` to not repeat
+            this.timing.reset();
             this.synth.start();
+            this.timing.start();
         } // when paused, the handler was called b/c of pause, should not reset
     },
-    setVisualTune: function(visualTune) {
+    onPlayEvent: function(event) {
+        this.oldElements.forEach(note => note.classList.remove("noteplaying"));
+        if (event && event.elements) {
+            const notes = event.elements.flat(1); // array of arrays
+            notes.forEach(note => note.classList.add("noteplaying"));
+            this.oldElements = notes;
+        } else {
+            this.oldElements = [];
+        }
+    },
+    setVisualTune: function(visualTune, timedVisualObj) {
         this.stop();
 
         if (visualTune) {
             this.state = "stopped";
             this.visualTune = visualTune;
+            if (this.timing) {
+                this.timing.replaceTarget(timedVisualObj);
+            } else {
+                this.timing = new ABCJS.TimingCallbacks(
+                    timedVisualObj,
+                    { eventCallback: (event) => this.onPlayEvent(event) },
+                );
+            }
             playButton.classList.remove("audiodisabled");
             stopButton.classList.remove("audiodisabled");
         } else {
