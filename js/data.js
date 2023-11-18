@@ -469,7 +469,7 @@ const songs = {
 	clef: "treble"
     },
     another_one_bites_the_dust: {
-	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,/8z/16|",
+	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16|",
 	bpm: "110",
 	metre: [4,4],
 	clef: "bass"
@@ -491,7 +491,21 @@ const songs = {
 	bpm: "95",
 	metre: [4,4],
 	clef: "treble"
+    },
+    falling_in_love: {
+	melody: "[K:D] D4/8- D3/16z/16| A6/8|D6/8-| D3/8z/8 E/8F/8| G6/8| F6/8|E6/8-| E2/8 z3/8A,/8| B,4/8- B,/83/16z/16| C4/8- C3/16z/16|D4/8- D3/16z/16| E2/8 F2/8 G2/8| F4/8- F3/16z/16| E4/8- E3/16z/16|D4/8- D3/16z/16|",
+	bpm: "101",
+	metre: [3,4],
+	clef: "treble"
+    },
+    mission_imposible: {
+	melody: "[K:Eb] [I:MIDI=program 40] G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8 | =G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8",
+	bpm: "180",
+	metre: [5,4],
+	clef: "treble"
+
     }
+    
 };
 
 const available_song = Object.keys(songs);
