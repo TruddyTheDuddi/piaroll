@@ -287,14 +287,10 @@ const playbackManager = {
         if (visualTune) {
             this.state = "stopped";
             this.visualTune = visualTune;
-            if (this.timing) {
-                this.timing.replaceTarget(timedVisualObj);
-            } else {
-                this.timing = new ABCJS.TimingCallbacks(
-                    timedVisualObj,
-                    { eventCallback: (event) => this.onPlayEvent(event) },
-                );
-            }
+            this.timing = new ABCJS.TimingCallbacks(
+                timedVisualObj,
+                { eventCallback: (event) => this.onPlayEvent(event) },
+            );
             playButton.classList.remove("audiodisabled");
             stopButton.classList.remove("audiodisabled");
         } else {
