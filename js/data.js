@@ -142,63 +142,174 @@ function draw_bars(elements) {
         if (element == null) {
             return "|";
         } else {
-            const note = element.source.noteType == NOTE_TYPE.NOTE ? "B" : "z";
+            const isNote = element.source.noteType == NOTE_TYPE.NOTE;
+            const note = isNote ? "B" : "z";
             const [num, den] = element.length.length;
 
-            const appendix = element.hasNext ? "-" : "";
+            const appendix = isNote ? (element.hasNext ? "-" : "") : " ";
             return note + num + "/" + den + appendix;
         }
     }).join("");
 }
 
-function render() {
-    var old_render = document.getElementById("renderoutput");
-    old_render.innerHTML = "";
-    var cursorControl = {}
-    var synthControl = new ABCJS.synth.SynthController();
-    // FIXME when there's an audio playing it will remain in some way, we may want to delete the node and create it again (maybe as the child of another node)
-    synthControl.load("#audiooutput",
-		      cursorControl,
-		      {
-			  displayLoop: true,
-			  displayRestart: true,
-			  displayPlay: true,
-			  displayProgress: false,
-			  // displayWarp: true
-		      }
-		     );
-    var audioParams = { chordsOff: true };
-    
-    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
+const piaSynthParams = {
+    soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
+    onEnded: () => playbackManager.onEnded(),
+};
 
-    const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
-
-    var selection_instrument = document.getElementById('instrumentinput');
-    var selection_song = document.getElementById('songinput');
-    const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
-    const voice_melody = selection_song.value == "freestyle" ? "" : "V:melody clef=" + songs[selection_song.value].clef + "\n";
-    const score = "%%score (perc) (melody)\n";
-    const static_part = "X:1\nQ:"+ timeline.bpm+"\nL:1/1\nM:"+timeString+"\nK:perc\n" + score + voice_perc + voice_melody;
-    const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument.value + "] " + draw_bars(notes)  + "|]";
-    const other_voice = selection_song.value == 'freestyle' ? "" : "[V:melody]  " + songs[selection_song.value].melody  +"|]";
-    var to_render = static_part + other_voice + noteString;
-    var visualObj = window.ABCJS.renderAbc("renderoutput", to_render);
-    var createSynth = new ABCJS.synth.CreateSynth();
-    createSynth.init({
-	visualObj: visualObj[0],
-	options: {
-	    soundFontUrl: "https://paulrosen.github.io/midi-js-soundfonts/MusyngKite/",
-	}
-    }).then(function () {
-	synthControl.setTune(visualObj[0], false, audioParams).then(function () {
-	    console.log("Audio successfully loaded.")
-	}).catch(function (error) {
-	    console.warn("Audio problem:", error);
-	});
-    }).catch(function (error) {
-	console.warn("Audio problem:", error);
-    });
+/** Combine two tunes which supports setting up a merged audio with the sequences of both tunes and the length of the first */
+function combineVisualTunes(tune1, tune2) {
+    return {
+        ...tune1,
+        setUpAudio: function(params) {
+            const seq1 = tune1.setUpAudio(params);
+            const seq2 = tune2.setUpAudio(params);
+            return {
+                totalDuration: seq1.totalDuration,
+                tracks: [...seq1.tracks, ...seq2.tracks],
+            };
+        },
+    };
 }
+
+function render() {
+    const notes = fit_notes(timeline.editor, [0, 1], timeline.timeSignature);
+    const timeString = timeline.timeSignature[0] + "/" + timeline.timeSignature[1];
+    var selection_instrument = document.getElementById('instrumentinput').value;
+
+    const voice_perc = "V:perc stem=up clef=perc stafflines=1 middle=B\n";
+    const generic_static_part = "X:1\nQ:" + timeline.bpm + "\nL:1/1\nM:" + timeString+"\nK:perc\n"
+    const noteString = "[V:perc] [I:MIDI= drummap B "+ selection_instrument + "] " + draw_bars(notes)  + "|]";
+
+    const visualObj = ABCJS.renderAbc("renderoutput", generic_static_part + voice_perc + noteString, {selectTypes: false});
+    var visualTune = visualObj[0];
+
+    var selection_song = document.getElementById('songinput').value;
+    if (selection_song != "freestyle") {
+        const voice_melody = "V:melody clef=" + songs[selection_song].clef + "\n";
+        const other_voice = "[V:melody] " + songs[selection_song].melody  +"|]";
+
+        const melodyVisualObj = ABCJS.renderAbc("*", generic_static_part + voice_melody + other_voice);
+        visualTune = combineVisualTunes(melodyVisualObj[0], visualTune);
+    } else if (timeline.editor.length == 0) {
+        visualTune = undefined;
+    }
+
+    playbackManager.setVisualTune(visualTune, visualObj[0]);
+}
+
+const playbackManager = {
+    synth: undefined,      // created on first run ;       if empty -> synth not ready
+    visualTune: undefined, // if set means init has to be run again -> synth not ready
+    timing: undefined,     // TimingCallbacks created when a visualTune is passed
+    oldElements: [],       // active in timing
+    state: "stopped",      // running | paused | stopped | disabled
+    _setState: function(state) {
+        let classes = playButton.classList;
+        if (this.state === "running") {
+            classes.remove("audiorunning");
+        }
+        if (state === "running") {
+            classes.add("audiorunning");
+        }
+        this.state = state;
+    },
+    toggle: function() {
+        if (this.state === "stopped") {
+            this._setState("running");
+            if (this.visualTune) { // not initialized yet
+                if (!this.synth) {
+                    this.synth = new ABCJS.synth.CreateSynth();
+                }
+
+                this.synth.init({
+                    visualObj: this.visualTune,
+                    options: piaSynthParams,
+                }).then(() => this.synth.prime())
+                .then(() => {
+                    if (this.state === "running") {
+                        this.visualTune = undefined;
+                        this.synth.start();
+                        this.timing.start();
+                    }
+                })
+                .catch(function (error) {
+                    console.warn("Audio problem:", error);
+                });
+            } else if (this.synth) {
+                this.synth.start();
+                this.timing.start(0); // always start at the beginning
+            }
+        } else if (this.state === "paused") {
+            // synthState is always ready when paused
+            this.synth.resume();
+            this.timing.start();
+            this._setState("running");
+        } else if (this.state === "running" && !this.visualTune) {
+            this.timing.pause();
+            this.synth.pause();
+            this._setState("paused");
+        } // if synthState is 'empty' and state is running, user is waiting for play
+    },
+    stop: function() {
+        if (this.state === "running" || this.state === "paused") {
+            if (this.synth && !this.visualTune) {
+                this.timing.stop(); // does not really reset...
+                this.synth.stop();
+
+                this.oldElements.forEach(note => note.classList.remove("noteplaying"));
+                this.oldElements = [];
+            }
+            this._setState("stopped");
+        }
+    },
+    onEnded: function() {
+        if (this.state === "running") {
+            // replace this line with `this.stop()` to not repeat
+            this.timing.reset();
+            this.synth.start();
+            this.timing.start();
+        } // when paused, the handler was called b/c of pause, should not reset
+    },
+    onPlayEvent: function(event) {
+        this.oldElements.forEach(note => note.classList.remove("noteplaying"));
+        if (event && event.elements) {
+            const notes = event.elements.flat(1); // array of arrays
+            notes.forEach(note => note.classList.add("noteplaying"));
+            this.oldElements = notes;
+        } else {
+            this.oldElements = [];
+        }
+    },
+    setVisualTune: function(visualTune, timedVisualObj) {
+        this.stop();
+
+        if (visualTune) {
+            this.state = "stopped";
+            this.visualTune = visualTune;
+            this.timing = new ABCJS.TimingCallbacks(
+                timedVisualObj,
+                { eventCallback: (event) => this.onPlayEvent(event) },
+            );
+            playButton.classList.remove("audiodisabled");
+            stopButton.classList.remove("audiodisabled");
+        } else {
+            this.state = "disabled"; // no _setState because was in stopped state before
+            playButton.classList.add("audiodisabled");
+            stopButton.classList.add("audiodisabled");
+        }
+    },
+};
+
+const playButton = document.getElementById("audioplay");
+playButton.addEventListener("click", () => {
+    playbackManager.toggle();
+});
+
+const stopButton = document.getElementById("audiostop");
+stopButton.addEventListener("click", () => {
+    playbackManager.stop();
+});
 
 const LENGTHS = {
     whole: noteLength({
@@ -358,7 +469,7 @@ const songs = {
 	clef: "treble"
     },
     another_one_bites_the_dust: {
-	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,/8z/16|",
+	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16|",
 	bpm: "110",
 	metre: [4,4],
 	clef: "bass"
@@ -380,7 +491,21 @@ const songs = {
 	bpm: "95",
 	metre: [4,4],
 	clef: "treble"
+    },
+    falling_in_love: {
+	melody: "[K:D] D4/8- D3/16z/16| A6/8|D6/8-| D3/8z/8 E/8F/8| G6/8| F6/8|E6/8-| E2/8 z3/8A,/8| B,4/8- B,/83/16z/16| C4/8- C3/16z/16|D4/8- D3/16z/16| E2/8 F2/8 G2/8| F4/8- F3/16z/16| E4/8- E3/16z/16|D4/8- D3/16z/16|",
+	bpm: "101",
+	metre: [3,4],
+	clef: "treble"
+    },
+    mission_imposible: {
+	melody: "[K:Eb] [I:MIDI=program 40] G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8 | =G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8",
+	bpm: "180",
+	metre: [5,4],
+	clef: "treble"
+
     }
+    
 };
 
 const available_song = Object.keys(songs);
