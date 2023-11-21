@@ -871,6 +871,12 @@ metreden_input.addEventListener("change", () => {
     render();
 });
 
+// For easier debugigng
+const DISABLE_SPLASH = true;
+if(DISABLE_SPLASH){
+    document.getElementById("modal").classList.add("hide");
+}
+
 // Close initial modal
 const closeModalBtn = document.getElementById("closeModal");
 const modal = document.getElementById("modal");
