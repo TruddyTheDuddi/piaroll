@@ -930,7 +930,7 @@ metreden_input.addEventListener("change", () => {
 });
 
 // For easier debugigng
-const DISABLE_SPLASH = true;
+const DISABLE_SPLASH = false;
 if(DISABLE_SPLASH){
     document.getElementById("modal").classList.add("hide");
 }
