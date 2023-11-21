@@ -744,6 +744,9 @@ let timeline = {
             diff = 0;
         }
         this.collectedData += action + Math.floor(diff / 1000);
+        
+        // Save analytics data to local storage
+        localStorage.setItem('analytics', this.collectedData);
     }
 };
 
@@ -960,7 +963,18 @@ render();
 // Copy to cliboard button
 const clpboard = document.getElementById("analitycsBtn");
 clpboard.addEventListener("click", () => {
-    navigator.clipboard.writeText(timeline.collectedData);
+    // Fetch from local data (in case of refresh or page quit)
+    let stats = localStorage.getItem('analytics');
+
+    if(stats == null){
+        // No data at all
+        stats = "none";
+    } else if (stats != timeline.collectedData) {
+        // Data was collected before, but not the current session
+        stats = "R" + stats;
+    }
+
+    navigator.clipboard.writeText(stats);
 
     // Show success msg
     const msg = document.getElementById("cb");
