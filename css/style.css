@@ -39,11 +39,35 @@ h1,h2,h3,p{
 }
 
 small{
-    opacity: 0.6;
+    color: var(--text_fade);
 }
 
 input[type="number"]{
     width: 5em;
+}
+
+button{
+    padding: 0.5em 2em;
+    border-radius: 0.5em;
+    border: none;
+    background-color: var(--selected);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+button:hover{
+    opacity: 0.8;
+    transition: opacity 0s;
+}
+
+button .icon{
+    height: 0.9em;
+    filter: invert(1);
 }
 
 .hidden{
@@ -297,6 +321,10 @@ input[type="number"]{
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect x='2' y='2' width='32' height='32' fill='black'/></svg>");
 }
 
+.noteplaying {
+    fill: var(--selected) !important;
+}
+
 .tool-panel .verti-sepa{
     width: 1.5px;
     background-color: var(--border-light);
@@ -475,7 +503,7 @@ input[type="number"]{
     padding-bottom: 1em;
     overflow-x: scroll !important;
     overflow-y: hidden !important;
-    border: 1.3px dashed rgba(0,0,0,0.3);
+    border: 1.4px solid rgba(0,0,0,0.1);
 }
 
 /* Modal */
@@ -532,27 +560,14 @@ input[type="number"]{
 }
 
 .modal .info button{
-    padding: 0.5em 2em;
-    border-radius: 0.5em;
-    border: none;
-    background-color: var(--selected);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
     margin-left: auto;
-    transition: opacity 0.15s;
-}
-
-.modal .info button:hover{
-    opacity: 0.8;
-    transition: opacity 0s;
 }
 
 /* Footer */
 footer{
     font-size: 0.8em;
     display: grid;
-    gap: 0.5em;
+    gap: 1em;
     align-items: center;
     text-align: center;
     margin: auto;
@@ -561,7 +576,7 @@ footer{
 }
 
 footer .logo{
-    height: 3.5em;
+    height: 2.5em;
     aspect-ratio: 1;
     margin: auto;
     cursor: pointer;
@@ -578,6 +593,46 @@ footer h3{
     font-weight: normal;
 }
 
-.noteplaying {
-    fill: var(--selected) !important;
+footer .inline{
+    display: flex;
+    gap: 0.5em;
+    margin: auto;
+    align-items: center;
+}
+
+.analitycs{
+    display: grid;
+    gap: 0.5em;
+    font-size: 0.8em;
+    margin: 0.5em auto;
+    align-items: center;
+    text-align: center;
+}
+
+.analitycs #cb{
+    margin-top: 0.25em;
+    opacity: 0;
+    transform: translateY(-1em);
+    transition: 0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
+    color: var(--text_fade);
+}
+
+.analitycs #cb.show{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.analitycs #cb b{
+    color: var(--selected);
+}
+
+.analitycs button{
+    padding: 0.5em 1em;
+    margin: auto;
+}
+
+footer .expl{
+    display: grid;
+    gap: 0.5em;
+    align-items: center;
 }
