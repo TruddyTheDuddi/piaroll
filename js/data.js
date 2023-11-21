@@ -229,7 +229,7 @@ const playbackManager = {
                 .then(() => {
                     if (this.state === "running") {
                         this.visualTune = undefined;
-                        timeline.collectedData += '>';
+                        timeline.collectAction('>');
                         this.synth.start();
                         this.timing.start();
                     }
@@ -238,7 +238,7 @@ const playbackManager = {
                     console.warn("Audio problem:", error);
                 });
             } else if (this.synth) {
-                timeline.collectedData += '>';
+                timeline.collectAction('>');
                 this.synth.start();
                 this.timing.start(0); // always start at the beginning
             }
@@ -268,7 +268,7 @@ const playbackManager = {
     onEnded: function() {
         if (this.state === "running") {
             // replace this line with `this.stop()` to not repeat
-            timeline.collectedData += ']';
+            timeline.collectAction(']');
             this.timing.reset();
             this.synth.start();
             this.timing.start();
@@ -520,7 +520,7 @@ available_song.map( (element, i) => {
     selection_song.append(opt);
 });
 selection_song.addEventListener("change", function() {
-    timeline.collectedData += '/';
+    timeline.collectAction('/');
     if (this.value == "freestyle") {
 	bpm_input.disabled = false;
 	metrenum_input.disabled = false;
@@ -641,7 +641,7 @@ let timeline = {
 
     // Add a note to the timeline at a specific position
     insert: function(note, pos = null){
-        this.collectedData += '+';
+        this.collectAction('+');
         if(pos == null){
             this.editor.push(note);
             // Add to the DOM, last -1 because of the adder element
@@ -655,7 +655,7 @@ let timeline = {
 
     // Remove a note from the timeline
     remove: function(note){
-        this.collectedData += '-';
+        this.collectAction('-');
         let index = this.editor.indexOf(note);
         if(index > -1){
             this.editor.splice(index, 1);
@@ -690,6 +690,16 @@ let timeline = {
     timelineHint: true,
 
     collectedData: '',
+    startTime: -1,
+    collectAction: function(action) {
+        const now = Date.now();
+        let diff = now - this.startTime;
+        if (this.startTime < 0) {
+            this.startTime = now;
+            diff = 0;
+        }
+        this.collectedData += action + Math.floor(diff / 1000);
+    }
 };
 
 
@@ -854,7 +864,7 @@ metrenum_input.addEventListener("change", () => {
         result.innerHTML = "The metre elements should be 1 or greater";
         return;
     }
-    timeline.collectedData += '|';
+    timeline.collectAction('|');
     timeline.timeSignature[0] = Number(metrenum_input.value);
     render();
 });
@@ -866,7 +876,7 @@ metreden_input.addEventListener("change", () => {
         result.innerHTML = "The metre elements should be 1 or greater";
         return;
     }
-    timeline.collectedData += '|';
+    timeline.collectAction('|');
     timeline.timeSignature[1] = Number(metreden_input.value);
     render();
 });
