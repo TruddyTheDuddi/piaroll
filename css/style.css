@@ -39,7 +39,7 @@ h1,h2,h3,p{
 }
 
 small{
-    opacity: 0.6;
+    color: var(--text_fade);
 }
 
 input[type="number"]{
@@ -611,6 +611,19 @@ footer .inline{
 
 .analitycs #cb{
     margin-top: 0.25em;
+    opacity: 0;
+    transform: translateY(-1em);
+    transition: 0.2s cubic-bezier(0.215, 0.610, 0.355, 1);
+    color: var(--text_fade);
+}
+
+.analitycs #cb.show{
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.analitycs #cb b{
+    color: var(--selected);
 }
 
 .analitycs button{

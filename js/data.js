@@ -911,3 +911,16 @@ createNoteSelector();
 
 // Init initially to see player buttons
 render();
+
+// Copy to cliboard button
+const clpboard = document.getElementById("analitycsBtn");
+clpboard.addEventListener("click", () => {
+    navigator.clipboard.writeText(timeline.collectedData);
+
+    // Show success msg
+    const msg = document.getElementById("cb");
+    msg.classList.add("show");
+    setTimeout(() => {
+        msg.classList.remove("show");
+    }, 2000);
+});
