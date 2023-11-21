@@ -431,82 +431,126 @@ let rests = [
     MUSIC_NOTES.restSixteenth
 ]
 
+// Instruments selector
 const instruments = {
-    bass_drum_1: "36",
-    acoustic_snare: "38",
-    pedal_hi_hat: "44",
-    ride_cymbal_1: "51",
-    closed_hi_hat: "42",
-    crash_cymbal_1: "49",
-    chinese_cymbal: "52",
-    high_tom: "50",
-    hi_mid_tom: "48",
-    low_tom: "45",
-    low_floor_tom: "41"
+    bass_drum_1: {
+        name: "Bass Drum 1",
+        val: "36"
+    },
+    acoustic_snare: {
+        name: "Acoustic Snare",
+        val: "38"
+    },
+    pedal_hi_hat: {
+        name: "Pedal Hi-Hat",
+        val: "44"
+    },
+    ride_cymbal_1: {
+        name: "Ride Cymbal 1",
+        val: "51"
+    },
+    closed_hi_hat: {
+        name: "Closed Hi-Hat",
+        val: "42"
+    },
+    crash_cymbal_1: {
+        name: "Crash Cymbal 1",
+        val: "49"
+    },
+    chinese_cymbal: {
+        name: "Chinese Cymbal",
+        val: "52"
+    },
+    high_tom: {
+        name: "High Tom",
+        val: "50"
+    },
+    hi_mid_tom: {
+        name: "Hi Mid Tom",
+        val: "48"
+    },
+    low_tom: {
+        name: "Low Tom",
+        val: "45"
+    },
+    low_floor_tom: {
+        name: "Low Floor Tom",
+        val: "41"
+    }
 };
 
 const available_inst = Object.keys(instruments);
 const selection_instrument = document.getElementById('instrumentinput');
 available_inst.map( (element, i) => {
     let opt = document.createElement("option");
-    opt.value = instruments[element];
-    opt.innerHTML = element;
+    opt.value = instruments[element].val;
+    opt.innerHTML = instruments[element].name;
     selection_instrument.append(opt);
 });
 selection_instrument.addEventListener("change", () => {
     render();
 });
 
+// Song selector
 const songs = {
-    freestyle: {},
+    freestyle: {
+        name: "Freestyle (no melody)",
+    },
     bella_ciao: {
-	melody: "[K:C] z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A",
-	bpm: "140",
-	metre: [4,4],
-	clef: "treble"
+        name: "Bella Ciao",
+        melody: "[K:C] z3/4 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8 A1/2 E1/8 A1/8B1/8 |c1/8c1/8 B1/8A1/8 c1/8c1/8 B1/8A1/8 |e1/4 e1/4 e1/4 d1/8e1/8 |f1/8 f1/2 f1/8 e1/8d1/8 |f1/8 e1/2 z1/8 d1/8c1/8 |B1/4 e1/8e1/8 B1/4 c1/4 |A",
+        bpm: "140",
+        metre: [4,4],
+        clef: "treble"
     },
     viva_la_vida: {
-	melody: "[K:Ab] [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 [E G,]/8 | z/8 [E G,]/8 z/8 [E G,]/8 z/8 [E G,]/8 E/8 [E G,]/8 | [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 [C F,]/8|  z/8 [C F,]/8  z/8 [C F,]/8  [C F,]/8 C/8  [C F,]/8 z/8",
-	bpm: "128",
-	metre: [4,4],
-	clef: "treble"
+        name: "Viva la Vida",
+        melody: "[K:Ab] [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 z/8 [D A,]/8 [E G,]/8 | z/8 [E G,]/8 z/8 [E G,]/8 z/8 [E G,]/8 E/8 [E G,]/8 | [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 z/8 [C A,]/8 [C F,]/8|  z/8 [C F,]/8  z/8 [C F,]/8  [C F,]/8 C/8  [C F,]/8 z/8",
+        bpm: "128",
+        metre: [4,4],
+        clef: "treble"
     },
     another_one_bites_the_dust: {
-	melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16|",
-	bpm: "110",
-	metre: [4,4],
-	clef: "bass"
+        name: "Another One Bites the Dust",
+        melody: "[K:C] [I:MIDI=program 34] z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16| z3/8F,,/16z3/16F,,/16z3/16F,,/16z/16| z2/8 z/16F,,/16F,,/16z/16 F,,/8^G,,/8 F,,/16^A,,/8z/16|",
+        bpm: "110",
+        metre: [4,4],
+        clef: "bass"
     },
     pallet_town: {
-	melody: "[K:G] [dG,-]/8[cG,-]/8 [BG,]/8[AE,-]/8 [gE,-]/8[eE,]/8 [fF,-]/8[eF,]/8| [dG,]3/8[BA,-]/8 [GA,-]/8[GA,]/8 [AG,-]/8[BG,]/8| [c-E,]3/8[cF,-]2/8[FF,]/8 [GE,-]/8[AE,]/8| [BG,]3/8[cE,-]/16[BE,-]/16 [A-E,]2/8 [AD,]2/8|",
-	bpm: "120",
-	metre: [4,4],
-	clef: "treble"
+        name: "Pallet Town",
+        melody: "[K:G] [dG,-]/8[cG,-]/8 [BG,]/8[AE,-]/8 [gE,-]/8[eE,]/8 [fF,-]/8[eF,]/8| [dG,]3/8[BA,-]/8 [GA,-]/8[GA,]/8 [AG,-]/8[BG,]/8| [c-E,]3/8[cF,-]2/8[FF,]/8 [GE,-]/8[AE,]/8| [BG,]3/8[cE,-]/16[BE,-]/16 [A-E,]2/8 [AD,]2/8|",
+        bpm: "120",
+        metre: [4,4],
+        clef: "treble"
     },
     tetris: {
-	melody: "[K:C] [e'-e-E,,E,,,]/8[e'eB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'dE,,E,,,]/8[e'B,-G,-E,-]/16[d'B,G,E,]/16 [c'cE,,E,,,]/8[bBB,G,E,]/8| [a-A-A,,A,,,]/8[aACA,E,]/8 [aAA,,A,,,]/8[c'cA,E,C,]/8 [e'-e-A,,A,,,]/8[e'eCA,E,]/8 [d'dA,,A,,,]/8[c'cECA,]/8| [b-B-^G,,G,,,]/8[bBB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'-d-G,,G,,,]/8[d'dEB,G,E,]/8 [e'-e-E,,E,,,]/8[e'eEB,G,E,]/8| [c'cA,,A,,,]/8[cAECA,E,C,]/8 [aAA,,,A,,,,]/8[ecAECA,E,]/8 [aAA,,A,,,]/8[aecAECA,]/8 [aA,]/16[bB,]/16[c'C]/16[d'D]/16| [e'eEE,]/8[d'-d-A,,F,,D,,]/8 [d'dFD,]/8[f'fA,,F,,D,,]/8 [a'-a-AA,]/8[a'aA,,F,,D,,]/8 [g'gA,A,,]/8[f'fF,F,,]/8| [e'-e-C,C,,]/8[e'-e-CC,]/8 [e'eC,C,,]/8[c'cCC,]/8 [e'-e-C,C,,]/8[e'eCA,E,]/8 [d'dG,,G,,,]/8[c'cCA,E,]/8| [b-B-B,,B,,,]/8[bBB,B,,]/8 [bBB,,B,,,]/8[c'cB,B,,]/8 [d'-d-DD,]/8[d'dE,E,,]/8 [e'-e-B,^G,E,]/8[e'eG,G,,]/8| [c'-c-A,,A,,,]/8[c'cA,E,C,]/8 [a-A-A,,A,,,]/8[aACA,E,]/8 [a-A-A,,A,,,]/8[aAECA,]/8 z/4|",
-	bpm: "160",
-	metre: [4,4],
-	clef: "treble"
+        name: "Tetris",
+        melody: "[K:C] [e'-e-E,,E,,,]/8[e'eB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'dE,,E,,,]/8[e'B,-G,-E,-]/16[d'B,G,E,]/16 [c'cE,,E,,,]/8[bBB,G,E,]/8| [a-A-A,,A,,,]/8[aACA,E,]/8 [aAA,,A,,,]/8[c'cA,E,C,]/8 [e'-e-A,,A,,,]/8[e'eCA,E,]/8 [d'dA,,A,,,]/8[c'cECA,]/8| [b-B-^G,,G,,,]/8[bBB,G,E,]/8 [bBE,,E,,,]/8[c'cB,G,E,]/8 [d'-d-G,,G,,,]/8[d'dEB,G,E,]/8 [e'-e-E,,E,,,]/8[e'eEB,G,E,]/8| [c'cA,,A,,,]/8[cAECA,E,C,]/8 [aAA,,,A,,,,]/8[ecAECA,E,]/8 [aAA,,A,,,]/8[aecAECA,]/8 [aA,]/16[bB,]/16[c'C]/16[d'D]/16| [e'eEE,]/8[d'-d-A,,F,,D,,]/8 [d'dFD,]/8[f'fA,,F,,D,,]/8 [a'-a-AA,]/8[a'aA,,F,,D,,]/8 [g'gA,A,,]/8[f'fF,F,,]/8| [e'-e-C,C,,]/8[e'-e-CC,]/8 [e'eC,C,,]/8[c'cCC,]/8 [e'-e-C,C,,]/8[e'eCA,E,]/8 [d'dG,,G,,,]/8[c'cCA,E,]/8| [b-B-B,,B,,,]/8[bBB,B,,]/8 [bBB,,B,,,]/8[c'cB,B,,]/8 [d'-d-DD,]/8[d'dE,E,,]/8 [e'-e-B,^G,E,]/8[e'eG,G,,]/8| [c'-c-A,,A,,,]/8[c'cA,E,C,]/8 [a-A-A,,A,,,]/8[aACA,E,]/8 [a-A-A,,A,,,]/8[aAECA,]/8 z/4|",
+        bpm: "160",
+        metre: [4,4],
+        clef: "treble"
     },
     sweet_home_alabama: {
-	melody: "[K:G] D,/8D,/8 [D-D,-]/16[D-A,-D,]/16[D-A,-]/16[DA,D,]/16 C,/16z/16C,/8- [D-G,-C,]3/16[D-G,-D,]/16| [D-G,-G,,]/16[DG,]/16G,,/8- [D-G,-G,,]3/16[D-G,-]/16 [D-G,-A,,]/16[DG,-^A,,]/16[G,B,,-]/16[D,B,,]/16 E,/16D,/16A,,/16B,,/16| D,/8D,/8 [D-D,-]/16[D-A,-D,]/16[D-A,-]/16[DA,D,]/16 C,/16z/16C,/8- [D-G,-C,]3/16[D-G,-D,]/16| [DG,G,,]/16z/16G,,/8- [DG,G,,-]3/16G,,/16 B,,/16-[B,,G,,]/16G,,/16C,/16- [C,G,,]/16G,,/16^C,/16G,,/16|",
-	bpm: "95",
-	metre: [4,4],
-	clef: "treble"
+        name: "Sweet Home Alabama",
+        melody: "[K:G] D,/8D,/8 [D-D,-]/16[D-A,-D,]/16[D-A,-]/16[DA,D,]/16 C,/16z/16C,/8- [D-G,-C,]3/16[D-G,-D,]/16| [D-G,-G,,]/16[DG,]/16G,,/8- [D-G,-G,,]3/16[D-G,-]/16 [D-G,-A,,]/16[DG,-^A,,]/16[G,B,,-]/16[D,B,,]/16 E,/16D,/16A,,/16B,,/16| D,/8D,/8 [D-D,-]/16[D-A,-D,]/16[D-A,-]/16[DA,D,]/16 C,/16z/16C,/8- [D-G,-C,]3/16[D-G,-D,]/16| [DG,G,,]/16z/16G,,/8- [DG,G,,-]3/16G,,/16 B,,/16-[B,,G,,]/16G,,/16C,/16- [C,G,,]/16G,,/16^C,/16G,,/16|",
+        bpm: "95",
+        metre: [4,4],
+        clef: "treble"
     },
     falling_in_love: {
-	melody: "[K:D] D4/8- D3/16z/16| A6/8|D6/8-| D3/8z/8 E/8F/8| G6/8| F6/8|E6/8-| E2/8 z3/8A,/8| B,4/8- B,/83/16z/16| C4/8- C3/16z/16|D4/8- D3/16z/16| E2/8 F2/8 G2/8| F4/8- F3/16z/16| E4/8- E3/16z/16|D4/8- D3/16z/16|",
-	bpm: "101",
-	metre: [3,4],
-	clef: "treble"
+        name: "Can't Help Falling in Love",
+        melody: "[K:D] D4/8- D3/16z/16| A6/8|D6/8-| D3/8z/8 E/8F/8| G6/8| F6/8|E6/8-| E2/8 z3/8A,/8| B,4/8- B,/83/16z/16| C4/8- C3/16z/16|D4/8- D3/16z/16| E2/8 F2/8 G2/8| F4/8- F3/16z/16| E4/8- E3/16z/16|D4/8- D3/16z/16|",
+        bpm: "101",
+        metre: [3,4],
+        clef: "treble"
     },
     mission_imposible: {
-	melody: "[K:Eb] [I:MIDI=program 40] G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8 | =G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8",
-	bpm: "180",
-	metre: [5,4],
-	clef: "treble"
-
+        name: "Mission Imposible",
+        melody: "[K:Eb] [I:MIDI=program 40] G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8 | =G/8z2/8G/8 z2/8 B/8z/8 c/8z/8 | G/8z2/8G/8 z2/8 F/8z/8 _G/8z/8",
+        bpm: "180",
+        metre: [5,4],
+	    clef: "treble"
     }
     
 };
@@ -516,26 +560,27 @@ const selection_song = document.getElementById('songinput');
 available_song.map( (element, i) => {
     let opt = document.createElement("option");
     opt.value = element;
-    opt.innerHTML = element;
+    opt.innerHTML = songs[element].name;
     selection_song.append(opt);
 });
 selection_song.addEventListener("change", function() {
     timeline.collectAction('/');
-    if (this.value == "freestyle") {
-	bpm_input.disabled = false;
-	metrenum_input.disabled = false;
-	metreden_input.disabled = false;
-    } else {
-	bpm_input.value = songs[this.value].bpm;
-	timeline.bpm = bpm_input.value;
-	bpm_input.disabled = true;
 
-	timeline.timeSignature[0] = songs[this.value].metre[0];
-	timeline.timeSignature[1] = songs[this.value].metre[1];
-	metrenum_input.value = timeline.timeSignature[0].toString();
-	metreden_input.value = timeline.timeSignature[1].toString();
-	metrenum_input.disabled = true;
-	metreden_input.disabled = true;
+    if (this.value == "freestyle") {
+        bpm_input.disabled = false;
+        metrenum_input.disabled = false;
+        metreden_input.disabled = false;
+    } else {
+        bpm_input.value = songs[this.value].bpm;
+        timeline.bpm = bpm_input.value;
+        bpm_input.disabled = true;
+
+        timeline.timeSignature[0] = songs[this.value].metre[0];
+        timeline.timeSignature[1] = songs[this.value].metre[1];
+        metrenum_input.value = timeline.timeSignature[0].toString();
+        metreden_input.value = timeline.timeSignature[1].toString();
+        metrenum_input.disabled = true;
+        metreden_input.disabled = true;
     }
 
     render();
